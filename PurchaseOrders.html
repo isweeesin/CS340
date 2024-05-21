@@ -1,0 +1,174 @@
+<html>
+<head>
+<title>PurchaseOrders</title>
+<link href="style.css" rel="stylesheet" type="text/css" />
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<script language="JavaScript">
+		function showform(dowhat) {
+			/*
+			* four DIVS: browse, insert, update, delete
+			* this function sets one visible the others not
+			*/
+			if (dowhat == 'insert'){
+				document.getElementById('browse').style.display = 'none';
+				document.getElementById('insert').style.display = 'block';
+				document.getElementById('update').style.display = 'none';
+				document.getElementById('delete').style.display = 'none';
+			}
+			else if (dowhat == 'update'){
+				document.getElementById('browse').style.display = 'none';
+				document.getElementById('insert').style.display = 'none';
+				document.getElementById('update').style.display = 'block';
+				document.getElementById('delete').style.display = 'none';
+			}
+			else if (dowhat == 'delete'){
+				document.getElementById('browse').style.display = 'none';
+				document.getElementById('insert').style.display = 'none';
+				document.getElementById('update').style.display = 'none';
+				document.getElementById('delete').style.display = 'block';
+			}
+      else if (dowhat == 'all'){
+				document.getElementById('browse').style.display = 'block';
+				document.getElementById('insert').style.display = 'block';
+				document.getElementById('update').style.display = 'block';
+				document.getElementById('delete').style.display = 'block';
+			}
+			else { //by default display browse
+				document.getElementById('browse').style.display = 'block';
+				document.getElementById('insert').style.display = 'none';
+				document.getElementById('update').style.display = 'none';
+				document.getElementById('delete').style.display = 'none';
+			}
+		}
+    function newPurchaseOrder() { showform('insert'); }
+    function updatePurchaseOrder(purchase_id) { showform('update'); }
+    function deletePurchaseOrder(purchase_id) { showform ('delete'); }
+    function browsePurchaseOrders() { showform ('browse'); }
+    function showAll() { showform ('all'); }
+</script>
+</head>
+
+<body onload="browsePurchaseOrders()">
+<h1>Purchase Orders</h1>
+
+[ <a href="Products.html">Products</a> | <a href="Customers.html">Customers</a> | <a href="RawMaterials.html">Raw Materials</a> | <a href="recipe.html">Recipe</a> | <a href="PurchaseOrders.html">Purchase Orders</a> | <a href="SalesOrders.html">Sales Orders</a>]
+
+<div id="browse">
+<p><a href="#" onClick="showAll()">Display all forms</a> </p>
+<table border="1" cellpadding="5">
+  <tr>
+    <th><a href="#" onClick="newPurchaseOrder()">New</a></th>
+    <th></th>
+    <th>Purchase ID</th>
+    <th>Raw Material</th>
+    <th>Total Cost</th>
+    <th>Order Oz</th>
+    <th>Date Received</th>
+  </tr>
+  <tr>
+    <td><a href="#" onClick="updatePurchaseOrder('this.PurchaseOrderID')">Edit</a></td>
+    <td><a href="#" onclick="deletePurchaseOrder('this.PurchaseOrderID')">Delete</a></td>
+    <td align="right" >1</td>
+    <td>Vinegar</td>
+    <td>125.10</td>
+    <td>417</td>
+    <td>2024-01-01</td>
+  </tr>
+  <tr>
+    <td><a href="#" onClick="updatePurchaseOrder('this.PurchaseOrderID')">Edit</a></td>
+    <td><a href="#" onclick="deletePurchaseOrder('this.PurchaseOrderID')">Delete</a></td>
+    <td align="right" >2</td>
+    <td>Jalapeno</td>
+    <td>64.20</td>
+    <td>216</td>
+    <td>2024-01-01</td>
+  </tr>
+  <tr>
+    <td><a href="#" onClick="updatePurchaseOrder('this.PurchaseOrderID')">Edit</a></td>
+    <td><a href="#" onclick="deletePurchaseOrder('this.PurchaseOrderID')">Delete</a></td>
+    <td>3</td>
+    <td>Lime Juice</td>
+    <td>70.20</td>
+    <td>156</td>
+    <td>2024-01-01</td>
+  </tr>
+  <tr>
+    <td><a href="#" onClick="updatePurchaseOrder('this.PurchaseOrderID')">Edit</a></td>
+    <td><a href="#" onclick="deletePurchaseOrder('this.PurchaseOrderID')">Delete</a></td>
+    <td align="right" >4</td>
+    <td>Ghost Pepper</td>
+    <td>64</td>
+    <td>64</td>
+    <td>2024-01-01</td>
+  </tr>
+  <tr>
+    <td><a href="#" onClick="updatePurchaseOrder('this.PurchaseOrderID')">Edit</a></td>
+    <td><a href="#" onclick="deletePurchaseOrder('this.PurchaseOrderID')">Delete</a></td>
+    <td align="right" >5</td>
+    <td>Habanero</td>
+    <td>52</td>
+    <td>104</td>
+    <td>2024-01-01</td>
+  </tr>
+</table>
+<p><a href="index.html">Go back to the home page</a></p>
+<p>&nbsp;</p>
+</div> <!-- browse -->
+<div id="insert">
+    <form method="POST" id="addPurchaseOrder">
+        <legend><strong>Add Purchase Order</strong></legend>
+          <fieldset class="fields">
+            <label> Raw Material name </label> <select name="raw_material_id">
+              <option value="0">Select</option>
+                <option value="1">Vinegar</option>
+                <option value="2">Lime Juice</option>
+                <option value="3">Jalapeno</option>
+                <option value="4">Habanero</option>
+                <option value="5">Ghost Pepper</option>
+                </select>
+            <label> Order Oz </label> <input type="text" name="order_oz">
+            <label> Date Received </label> <input type="text" name="date_received">
+      </fieldset>
+          <input class="btn" type="submit" id="addPurchaseOrder" value="Add PurchaseOrder">
+          <input class="btn" type="button" value="cancel" onClick="browsePurchaseOrders()">
+	</form> 
+</div><!-- insert -->
+<p>&nbsp;</p>
+<div id="update">
+    <form method="POST" id="UpdatePurchaseOrder">
+        <legend><strong>Update Purchase Order</strong></legend>
+          <fieldset class="fields">
+          <input type="hidden" name="PurchaseOrderID" id="updatePurchaseOrderID" value="1">
+          <label> ID: </label> 1
+          <label> Raw Material name </label> <select name="raw_material_id">
+            <option value="0">Select</option>
+              <option value="1">Vinegar</option>
+              <option value="2">Lime Juice</option>
+              <option value="3">Jalapeno</option>
+              <option value="4">Habanero</option>
+              <option value="5">Ghost Pepper</option>
+              </select>
+            <label> Order Oz </label> <input type="text" name="order_oz" value="417">
+            <label> Date Shipped </label> <input type="text" name="date_received" value="2024-01-01">
+      </fieldset>
+          <input class="btn" type="submit" id="UpdateSavePurchaseOrder" value="Save Update PurchaseOrder">
+          <input class="btn" type="button" value="cancel" onClick="browsePurchaseOrders()">
+	</form> 
+</div><!-- update -->
+<p>&nbsp;</p>
+<div id="delete" style="display: block">
+  <form method="POST" id="deletePurchaseOrder">
+      <legend><strong>Delete Purchase Order</strong></legend>
+          <fieldset class="fields">
+          <p>Are you sure you wish to delete the following?</p>
+          <input type="hidden" name="PurchaseOrderID" id="deletePurchaseOrderID" value="1">
+          <label><strong>ID:</strong></label> 1
+            <label> <strong>Raw Material</strong> </label> Vinegar
+    </fieldset>
+    <input class="btn" type="submit" id="DeletePurchaseOrder" value="Delete PurchaseOrder">
+          <input class="btn" type="button" value="cancel" onClick="browsePurchaseOrders()">
+  </form> 
+</div><!-- delete -->
+
+</body>
+</html>

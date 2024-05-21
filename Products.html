@@ -1,0 +1,206 @@
+<html>
+<head>
+<title>Products</title>
+<link href="style.css" rel="stylesheet" type="text/css" />
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<script language="JavaScript">
+  function submitProduct() {
+    // Optionally, you can handle your form submission tasks here
+    // For now, we'll directly simulate the click on the "New" link
+    newRecipe(); // Call the function that's tied to clicking the "New" link
+    }
+		function showform(dowhat) {
+			/*
+			* four DIVS: browse, insert, update, delete
+			* this function sets one visible the others not
+			*/
+			if (dowhat == 'insert'){
+				document.getElementById('browse').style.display = 'none';
+				document.getElementById('insert').style.display = 'block';
+				document.getElementById('update').style.display = 'none';
+				document.getElementById('delete').style.display = 'none';
+			}
+			else if (dowhat == 'update'){
+				document.getElementById('browse').style.display = 'none';
+				document.getElementById('insert').style.display = 'none';
+				document.getElementById('update').style.display = 'block';
+				document.getElementById('delete').style.display = 'none';
+			}
+			else if (dowhat == 'delete'){
+				document.getElementById('browse').style.display = 'none';
+				document.getElementById('insert').style.display = 'none';
+				document.getElementById('update').style.display = 'none';
+				document.getElementById('delete').style.display = 'block';
+			}
+      else if (dowhat == 'all'){
+				document.getElementById('browse').style.display = 'block';
+				document.getElementById('insert').style.display = 'block';
+				document.getElementById('update').style.display = 'block';
+				document.getElementById('delete').style.display = 'block';
+			}
+			else { //by default display browse
+				document.getElementById('browse').style.display = 'block';
+				document.getElementById('insert').style.display = 'none';
+				document.getElementById('update').style.display = 'none';
+				document.getElementById('delete').style.display = 'none';
+			}
+		}
+    function newProduct() { showform('insert'); }
+    function updateProduct(product_id) { showform('update'); }
+    function deleteProduct(product_id) { showform ('delete'); }
+    function browseProducts() { showform ('browse'); }
+    function showAll() { showform ('all'); }
+</script>
+</head>
+
+<body onload="browseProducts()">
+<h1>Products</h1>
+
+[ <a href="Products.html">Products</a> | <a href="Customers.html">Customers</a> | <a href="RawMaterials.html">Raw Materials</a> | <a href="recipe.html">Recipe</a> | <a href="PurchaseOrders.html">Purchase Orders</a> | <a href="SalesOrders.html">Sales Orders</a>]
+
+<div id="browse">
+<p><a href="#" onClick="showAll()">Display all forms</a> </p>
+<table border="1" cellpadding="5">
+  <tr>
+    <th><a href="#" onClick="newProduct()">New</a></th>
+    <th></th>
+    <th>Product ID</th>
+    <th>Flavor</th>
+    <th>Price Per bottle</th>
+  </tr>
+  <tr>
+    <td><a href="#" onClick="updateProduct('this.ProductID')">Edit</a></td>
+    <td><a href="#" onclick="deleteProduct('this.ProductID')">Delete</a></td>
+    <td align="right" >1</td>
+    <td >Brent's Blazin</td>
+    <td align="right" >5.25</td>
+  </tr>
+  <tr>
+    <td><a href="#" onClick="updateProduct('this.ProductID')">Edit</a></td>
+    <td><a href="#" onclick="deleteProduct('this.ProductID')">Delete</a></td>
+    <td align="right" >2</td>
+    <td>Nadir's Nectar</td>
+    <td align="right" >5.25</td>
+  </tr>
+  <tr>
+    <td><a href="#" onClick="updateProduct('this.ProductID')">Edit</a></td>
+    <td><a href="#" onclick="deleteProduct('this.ProductID')">Delete</a></td>
+    <td>3</td>
+    <td>The Best Nectar</td>
+    <td align="right" >5.25</td>
+  </tr>
+</table>
+<p><a href="index.html">Go back to the home page</a></p>
+<p>&nbsp;</p>
+</div> <!-- browse -->
+<div id="insert" style="display: block">
+  <form id="addProduct">
+      <legend><strong>Add Product</strong></legend>
+        <fieldset class="fields">
+          <label> flavor </label> <input type="text" name="flavor" id="flavorInput">
+          <label> price_per_bottle </label> <input type="text" name="price_per_bottle">
+          <p style="color:red;">Add product first!</p>
+        </fieldset>
+        <input class="btn" type="button" id="addProduct" value="Add a Product">
+        <input class="btn" type="button" value="cancel">
+      <legend><strong>Add product Recipe</strong></legend>
+      <p style="color:red;">After adding your product, add the two ingredients.</p>
+        <fieldset class="fields">
+          <label> New Flavor </label> <input type="text" name="flavor" id="newFlavorInput1" readonly>
+          <label> Ingredient # 1 </label> <select name="raw_material_id">
+            <option value="0">Select</option>
+              <option value="1">Vinegar</option>
+              <option value="2">Lime Juice</option>
+              <option value="3">Jalapeno</option>
+              <option value="4">Habanero</option>
+              <option value="5">Ghost Pepper</option>
+              </select>
+          <label> required_oz </label> <input type="text" name="quantity_oz">
+          <label> New Flavor </label> <input type="text" name="flavor" id="newFlavorInput2" readonly>
+          <label> Ingredient # 2 </label> <select name="raw_material_id">
+            <option value="0">Select</option>
+              <option value="1">Vinegar</option>
+              <option value="2">Lime Juice</option>
+              <option value="3">Jalapeno</option>
+              <option value="4">Habanero</option>
+              <option value="5">Ghost Pepper</option>
+              </select>
+          <label> required_oz </label> <input type="text" name="quantity_oz">
+    </fieldset>
+        <input class="btn" type="submit" id="addRecipe" value="Add Recipe" disabled>
+        <input class="btn" type="button" value="cancel" onClick="browseRecipes()">
+</form> 
+</div><!-- update -->
+<script> 
+  const flavorInput = document.getElementById('flavorInput');
+  const newFlavorInput1 = document.getElementById('newFlavorInput1');
+  const newFlavorInput2 = document.getElementById('newFlavorInput2');
+  const addProductBtn = document.getElementById('addProduct');
+  const addRecipeBtn = document.getElementById('addRecipe');
+  /* check inputs for add product */
+  addProductBtn.addEventListener('click', (event) => {
+    if (event.target.id === 'addProduct') {
+      if (flavorInput.value && document.querySelector('#addProduct input[name="price_per_bottle"]').value) {
+        newFlavorInput1.value = flavorInput.value;
+        newFlavorInput2.value = flavorInput.value;
+        addRecipeBtn.disabled = false;
+      } else {
+        alert('Please fill out both flavor and price_per_bottle fields.');
+      }
+    }
+  });
+  /* match flavor input to recipe flavor */
+  flavorInput.addEventListener('input', () => {
+    newFlavorInput1.value = flavorInput.value;
+    newFlavorInput2.value = flavorInput.value;
+  });
+
+  document.querySelector('#addProduct input[name="price_per_bottle"]').addEventListener('input', () => {
+    if (flavorInput.value && document.querySelector('#addProduct input[name="price_per_bottle"]').value) {
+      addRecipeBtn.disabled = false;
+    } else {
+      addRecipeBtn.disabled = true;
+    }
+  });
+</script>
+<p>&nbsp;</p>
+<div id="update">
+    <form method="POST" id="UpdateProduct">
+        <legend><strong>Update Product</strong></legend>
+          <fieldset class="fields">
+          <input type="hidden" name="ProductID" id="updateProductID" value="1">
+          <label> ID: </label> 1
+          <label>Flavor </label> <select name="flavor">
+            <option value="0">Select</option>
+              <option value="1">Brent's Blazin</option>
+              <option value="2">Nadir's Nectar</option>
+              <option value="3">The Best Nectar</option>
+            </select>
+            <label> Price Per Bottle </label> <input type="text" name="price_per_bottle" value="5.25">
+      </fieldset>
+          <input class="btn" type="submit" id="UpdateSaveProduct" value="Save Update Product">
+          <input class="btn" type="button" value="cancel" onClick="browseProducts()">
+	</form> 
+</div><!-- delete -->
+<p>&nbsp;</p>
+<div id="delete" style="display: block">
+  <form method="POST" id="deleteProduct">
+      <legend><strong>Delete Product</strong></legend>
+          <fieldset class="fields">
+          <p>Are you sure you wish to delete the following?</p>
+          <input type="hidden" name="ProductID" id="deleteProductID" value="1">
+          <label><strong>ID:</strong></label> 1
+          <label>Flavor </label> <select name="flavor">
+              <option value="0">Select</option>
+                <option value="1">Brent's Blazin</option>
+                <option value="2">Nadir's Nectar</option>
+                <option value="3">The Best Nectar</option>
+              </select>
+    </fieldset>
+    <input class="btn" type="submit" id="DeleteProduct" value="Delete Product">
+          <input class="btn" type="button" value="cancel" onClick="browseProducts()">
+  </form> 
+</div>
+
+</body>
+</html>
