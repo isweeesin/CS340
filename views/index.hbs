@@ -1,0 +1,90 @@
+{{!-- Just some plain text --}}
+<h1>The server is running!</h1>
+<p>If you see this text, the server is <strong>definitely</strong> working!</p>
+
+{{!-- The Data from our Database --}}
+
+{{!-- Create a table --}}
+<table border="1" cellpadding="5"  id="customers-table">
+
+    {{!-- Header section --}}
+    <thead>
+
+        {{!-- For just the first row, we print each key of the row object as a header cell so we
+        know what each column means when the page renders --}}
+        <tr>
+            {{#each data.[0]}}
+            <th>
+                {{@key}}
+            </th>
+            {{/each}}
+        </tr>
+    </thead>
+
+    {{!-- Body section --}}
+    <tbody>
+
+        {{!-- For each row, print the id, fname, lname, homeworld and age, in order --}}
+        {{#each data}}
+        <tr data-value="{{this.customer_id}}">
+            <td>{{this.customer_id}}</td>
+            <td>{{this.name}}</td>
+            <td>{{this.phone_number}}</td>
+            <td>{{this.email}}</td>
+            <td><button onclick="deleteCustomer({{this.customer_id}})">Delete</button></td>
+        </tr>
+        {{/each}}
+    </tbody>
+
+</table>
+<script src="./js/delete_customer.js"></script>
+
+
+<h2>Search Using an HTML Form</h2>
+<p>Search by name using the field below.</p>
+
+<form id="search-customer-html" method='GET' action='/'>
+    <label for="input-name">Search by Name: </label>
+    <input type="text" name="name" id="input-name-html-search">
+    
+    <input type="submit">
+</form>
+
+
+{{!-- Form to add a record to the table using standard HTML forms --}}
+<h2>Adding Data using an HTML form</h2>
+<p>To add a new person, please enter their information below and click `Submit`!</p>
+<form id="add-customer-form" method="POST" action="/add-customer-form">
+    <label for="input-name">Name: </label>
+    <input type="text" name="input-name" id="input-name">
+    
+    <label for="input-phone_number">Phone Number: </label>
+    <input type="text" name="input-phone_number" id="input-phone_number">
+
+    <label for="input-email">Email: </label>
+    <input type="text" name="input-email" id="input-email">
+
+    <input type="submit">
+</form>
+
+<h2>Updating User's Info</h2>
+<p>To update a specific user's info, select their name from the drop-down menu on the left</p>
+<form id="update-customer-form-ajax">
+    <label for="mySelect">Select Customer: </label>
+    <select name="input-name" id="mySelect">
+        <option value="test">Select a Customer</option>
+        {{#each data}}
+        <option value="{{this.customer_id}}">{{this.name}}</option>
+        {{/each}}
+    </select>
+    <label for="input-new-name">New Name: </label>
+    <input type="text" name="input-new-name" id="input-new-name">
+    <label for="input-phone_number">Phone Number: </label>
+    <input type="text" name="input-phone_number" id="input-phone_number">
+    <label for="input-email">Email: </label>
+    <input type="text" name="input-email" id="input-email">
+    <input type="submit" value="Update">
+</form>
+
+<script src="/js/delete_customer.js"></script>
+<script src="/js/update_customer.js"></script>
