@@ -1,11 +1,18 @@
+
+// Citation for the following function: app.js -> Express setup, CRUD using route handlers
+// Date: 5/22/2024
+// Adapted from: Starter code for 'Developing in Node.JS'.
+// Source URL: https://canvas.oregonstate.edu/courses/1958399/pages/exploration-developing-in-node-dot-js?module_item_id=24181856
+
+
 // app.js
 /*
     SETUP
 */
 // Express
-var express = require('express');   // We are using the express library for the web server
+var express = require('express');   // library from web server
 var app     = express();            // We need to instantiate an express object to interact with the server in our code
-PORT        = 1025;  
+PORT        = 1102;  
 
 // Middleware to parse request body
 app.use(express.urlencoded({ extended: true }));
@@ -29,6 +36,7 @@ var db = require('./Database/db-connector')
     ROUTES
 */
 
+/* READ */
 app.get('/', function(req, res) {
     // Declare Query 1
     let query1;
@@ -56,7 +64,7 @@ app.get('/', function(req, res) {
     });
 });
                                      // will process this file, before sending the finished HTML to the client.
-
+/* CREATE */
 app.post('/add-customer-form', function(req, res){
     // Capture the incoming data and parse it back to a JS object
     let data = req.body;
@@ -86,12 +94,12 @@ app.post('/add-customer-form', function(req, res){
         }
     })
 })
-
+/* DELETE */
 app.delete('/delete-customer-ajax/', function(req, res, next) {
     let data = req.body;
     let customer_id = parseInt(data.id);
     let delete_customer = `DELETE FROM Customers WHERE customer_id = ?`;
-
+    /* CASCADE should handle SalesOrder table where customer is FK */
     db.pool.query(delete_customer, [customer_id], function(error, rows, fields) {
         if (error) {
             console.log(error);
@@ -102,10 +110,11 @@ app.delete('/delete-customer-ajax/', function(req, res, next) {
     });
 });
 
-
+/* UPDATE */
 app.put('/update-customer-ajax', function(req, res) {
     let data = req.body;
     let query = `UPDATE Customers SET name = ?, phone_number = ?, email = ? WHERE customer_id = ?`;
+    /* use params based on data object from update_customer.js */
     let params = [data.name, data.phone_number, data.email, data.customer_id];
 
     db.pool.query(query, params, function(error, rows, fields) {
