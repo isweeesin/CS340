@@ -1,10 +1,20 @@
+{{!-- Citation for the following file: index.hbs -> handlebar for Customer page
+Date: 5/22/2024
+Copied from:
+Starter code for 'Developing in Node.JS'.
+Source URL: https://canvas.oregonstate.edu/courses/1958399/pages/exploration-developing-in-node-dot-js?module_item_id=24181856
+--}}
+
+
+
+
 {{!-- Just some plain text --}}
-<h1>The server is running!</h1>
+<h1>"The Best" Hot Sauce Customers</h1>
 <p>If you see this text, the server is <strong>definitely</strong> working!</p>
 
-{{!-- The Data from our Database --}}
+{{!-- data from database  --}}
 
-{{!-- Create a table --}}
+{{!-- Create customers table --}}
 <table border="1" cellpadding="5"  id="customers-table">
 
     {{!-- Header section --}}
@@ -24,7 +34,7 @@
     {{!-- Body section --}}
     <tbody>
 
-        {{!-- For each row, print the id, fname, lname, homeworld and age, in order --}}
+        {{!-- For each row, print the customer_id, , name, phone number and emauk, in order + delete button --}}
         {{#each data}}
         <tr data-value="{{this.customer_id}}">
             <td>{{this.customer_id}}</td>
@@ -40,20 +50,20 @@
 <script src="./js/delete_customer.js"></script>
 
 
-<h2>Search Using an HTML Form</h2>
+<h2>Search Customers</h2>
 <p>Search by name using the field below.</p>
 
 <form id="search-customer-html" method='GET' action='/'>
-    <label for="input-name">Search by Name: </label>
+    <label for="input-name">Search: </label>
     <input type="text" name="name" id="input-name-html-search">
     
     <input type="submit">
 </form>
 
 
-{{!-- Form to add a record to the table using standard HTML forms --}}
-<h2>Adding Data using an HTML form</h2>
-<p>To add a new person, please enter their information below and click `Submit`!</p>
+{{!-- Form to add a record to Customer table using standard HTML forms --}}
+<h2>Add a New Customer</h2>
+<p>To add a new customer, please enter their information below and click `Submit`!</p>
 <form id="add-customer-form" method="POST" action="/add-customer-form">
     <label for="input-name">Name: </label>
     <input type="text" name="input-name" id="input-name">
@@ -66,9 +76,9 @@
 
     <input type="submit">
 </form>
-
-<h2>Updating User's Info</h2>
-<p>To update a specific user's info, select their name from the drop-down menu on the left</p>
+{{!-- form to update customer table using ajax --}}
+<h2>Updating Customer Information</h2>
+<p>To update a specific user's info, select an existing customer, make your changes, and 'submit'.</p>
 <form id="update-customer-form-ajax">
     <label for="mySelect">Select Customer: </label>
     <select name="input-name" id="mySelect">
@@ -77,12 +87,13 @@
         <option value="{{this.customer_id}}">{{this.name}}</option>
         {{/each}}
     </select>
+    {{!-- ID's must be different than INSERT --}}
     <label for="input-new-name">New Name: </label>
     <input type="text" name="input-new-name" id="input-new-name">
-    <label for="input-phone_number">Phone Number: </label>
-    <input type="text" name="input-phone_number" id="input-phone_number">
-    <label for="input-email">Email: </label>
-    <input type="text" name="input-email" id="input-email">
+    <label for="update-phone_number">Phone Number: </label>
+    <input type="text" name="update-phone_number" id="update-phone_number">
+    <label for="update-email">Email: </label>
+    <input type="text" name="update-email" id="update-email">
     <input type="submit" value="Update">
 </form>
 
