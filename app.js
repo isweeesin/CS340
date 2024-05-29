@@ -37,7 +37,13 @@ var db = require('./Database/db-connector')
 */
 
 /* READ */
+// Route for the index page
 app.get('/', function(req, res) {
+    res.render('index', { message: 'Welcome to the Index Page' });
+});
+
+/* READ Customer*/
+app.get('/Customers', function(req, res) {
     // Declare Query 1
     let query1;
 
@@ -60,7 +66,7 @@ app.get('/', function(req, res) {
         // Save the customers
         let customers = rows;
 
-        return res.render('index', { data: customers });
+        return res.render('Customers', { data: customers });
     });
 });
                                      // will process this file, before sending the finished HTML to the client.
@@ -94,6 +100,7 @@ app.post('/add-customer-form', function(req, res){
         }
     })
 })
+
 /* DELETE */
 app.delete('/delete-customer-ajax/', function(req, res, next) {
     let data = req.body;
@@ -127,6 +134,166 @@ app.put('/update-customer-ajax', function(req, res) {
     });
 });
 
+
+/*
+
+    READ Raw Material   
+
+*/
+app.get('/RawMaterials', function(req, res) {
+    // Declare Query 2
+    let query2;
+
+    // If there is no query string, we just perform a basic SELECT
+    if (req.query.material_name === undefined) {
+        query2 = "SELECT * FROM RawMaterials;";
+    }
+    // If there is a query string, we assume this is a search, and return desired results
+    else {
+        query2 = `SELECT * FROM RawMaterials WHERE material_name LIKE "${req.query.material_name}%"`;
+    }
+
+    // Run the 1st query
+    db.pool.query(query2, function(error, rows, fields) {
+        if (error) {
+            console.log(error);
+            return res.sendStatus(500);
+        }
+
+        // Save the customers
+        let raw_materials = rows;
+
+        return res.render('RawMaterials', { data: raw_materials });
+    });
+});
+
+/*
+
+    READ Recipes   
+
+*/
+app.get('/recipe', function(req, res) {
+    // Declare Query 3
+    let query3;
+
+    // If there is no query string, we just perform a basic SELECT
+    if (req.query.flavor === undefined) {
+        query3 = "SELECT Products.flavor, RawMaterials.material_name, Recipes.required_oz FROM Recipes JOIN Products ON Recipes.product_id = Products.product_id LEFT JOIN RawMaterials ON Recipes.raw_material_id = RawMaterials.raw_material_id;";
+    }
+    // If there is a query string, we assume this is a search, and return desired results
+    else {
+        query3 = `SELECT Products.flavor, RawMaterials.material_name, Recipes.required_oz FROM Recipes JOIN Products ON Recipes.product_id = Products.product_id LEFT JOIN RawMaterials ON Recipes.raw_material_id = RawMaterials.raw_material_id WHERE flavor LIKE "${req.query.flavor}%"`;
+    }
+
+    // Run the 1st query
+    db.pool.query(query3, function(error, rows, fields) {
+        if (error) {
+            console.log(error);
+            return res.sendStatus(500);
+        }
+
+        // Save the customers
+        let recipes = rows;
+
+        return res.render('recipe', { data: recipes });
+    });
+});
+
+/*
+
+    READ Purchase Orders   
+
+*/
+app.get('/PurchaseOrders', function(req, res) {
+    // Declare Query 4
+    let query4;
+
+    // If there is no query string, we just perform a basic SELECT
+    if (req.query.raw_material_name === undefined) {
+        query4 = "SELECT PurchaseOrders.purchase_id, RawMaterials.material_name, PurchaseOrders.total_cost, PurchaseOrders.order_oz, PurchaseOrders.date_received FROM PurchaseOrders JOIN RawMaterials ON PurchaseOrders.raw_material_id = RawMaterials.raw_material_id;";
+    }
+    // If there is a query string, we assume this is a search, and return desired results
+    else {
+        query4 = `SELECT PurchaseOrders.purchase_id, RawMaterials.material_name, PurchaseOrders.total_cost, PurchaseOrders.order_oz, PurchaseOrders.date_received FROM PurchaseOrders JOIN RawMaterials ON PurchaseOrders.raw_material_id = RawMaterials.raw_material_id WHERE RawMaterials.material_name LIKE "${req.query.raw_material_name}%"`;
+    }
+
+    // Run the 1st query
+    db.pool.query(query4, function(error, rows, fields) {
+        if (error) {
+            console.log(error);
+            return res.sendStatus(500);
+        }
+
+        // Save the customers
+        let PurchaseOrder = rows;
+
+        return res.render('PurchaseOrders', { data: PurchaseOrder });
+    });
+});
+
+/*
+
+    READ Sales Orders   
+
+*/
+app.get('/SalesOrders', function(req, res) {
+    // Declare Query 5
+    let query5;
+
+    // If there is no query string, we just perform a basic SELECT
+    if (req.query.flavor === undefined) {
+        query5 = "SELECT SalesOrders.sale_id, Products.flavor, Customers.name, SalesOrders.bottle_quantity, SalesOrders.date_shipped, SalesOrders.total_sale, SalesOrders.total_cost FROM SalesOrders JOIN Products ON SalesOrders.product_id = Products.product_id JOIN Customers ON SalesOrders.customer_id = Customers.customer_id;";
+    }
+    // If there is a query string, we assume this is a search, and return desired results
+    else {
+        query5 = `SELECT SalesOrders.sale_id, Products.flavor, Customers.name, SalesOrders.bottle_quantity, SalesOrders.date_shipped, SalesOrders.total_sale, SalesOrders.total_cost FROM SalesOrders JOIN Products ON SalesOrders.product_id = Products.product_id JOIN Customers ON SalesOrders.customer_id = Customers.customer_id WHERE Products.flavor LIKE "${req.query.flavor}%"`;
+    }
+
+    // Run the 1st query
+    db.pool.query(query5, function(error, rows, fields) {
+        if (error) {
+            console.log(error);
+            return res.sendStatus(500);
+        }
+
+        // Save the customers
+        let SalesOrder = rows;
+
+        return res.render('SalesOrders', { data: SalesOrder });
+    });
+});
+
+/*
+
+    READ Products   
+
+*/
+app.get('/Products', function(req, res) {
+    // Declare Query 6
+    let query6;
+
+    // If there is no query string, we just perform a basic SELECT
+    if (req.query.flavor === undefined) {
+        query6 = "SELECT * FROM Products;";
+    }
+    // If there is a query string, we assume this is a search, and return desired results
+    else {
+        query6 = `SELECT * FROM Products WHERE flavor LIKE "${req.query.flavor}%"`;
+    }
+
+    // Run the 1st query
+    db.pool.query(query6, function(error, rows, fields) {
+        if (error) {
+            console.log(error);
+            return res.sendStatus(500);
+        }
+
+        // Save the customers
+        let Product = rows;
+
+        return res.render('Products', { data: Product });
+    });
+});
 
 
 

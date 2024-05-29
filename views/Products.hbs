@@ -1,0 +1,91 @@
+
+{{!-- Just some plain text --}}
+<h1>"The Best" Hot Sauce Products page</h1>
+<h3><a href="/"> HOME PAGE</a></h3>
+[ <a href="Products">Products</a> | <a href="Customers">Customers</a> | <a href="RawMaterials">Raw Materials</a> | <a href="recipe">Recipe</a> | <a href="PurchaseOrders">Purchase Orders</a> | <a href="SalesOrders">Sales Orders</a>]
+{{!-- data from database  --}}
+
+{{!-- Create Prodcuts table --}}
+<table border="1" cellpadding="5"  id="products-table">
+
+    {{!-- Header section --}}
+    <thead>
+
+        {{!-- For just the first row, we print each key of the row object as a header cell so we
+        know what each column means when the page renders --}}
+        <tr>
+            {{#each data.[0]}}
+            <th>
+                {{@key}}
+            </th>
+            {{/each}}
+        </tr>
+    </thead>
+
+    {{!-- Body section --}}
+    <tbody>
+
+        {{!-- For each row, print the product_id, , flavor, price per bottle, in order + delete button --}}
+        {{#each data}}
+        <tr data-value="{{this.product_id}}">
+            <td>{{this.product_id}}</td>
+            <td>{{this.flavor}}</td>
+            <td>{{this.price_per_bottle}}</td>
+            <td><button onclick="deleteProduct({{this.product_id}})">Delete</button></td>
+        </tr>
+        {{/each}}
+    </tbody>
+
+</table>
+<script src="./js/delete_raw_material.js"></script>
+
+
+<h2>Search Products</h2>
+<p>Search by flavor using the field below.</p>
+
+<form id="search-flavor-html" method='GET' action='/Products'>
+    <label for="input-flavor">Search: </label>
+    <input type="text" name="flavor" id="input-flavor">
+    
+    <input type="submit">
+</form>
+
+{{!-- Form to add a record to Customer table using standard HTML forms --}}
+<h2>Add a New Raw Material</h2>
+<p>To add Raw Material, please enter the details below and click `Submit`!</p>
+<form id="add-raw_material-form" method="POST" action="/add-raw_material-form">
+    <label for="input-raw-material-name">Name: </label>
+    <input type="text" name="input-raw-material-name" id="input-raw-material-name">
+    
+    <label for="input-cost-per-oz">Cost Per Oz: </label>
+    <input type="number" name="input-cost-per-oz" id="input-cost-per-oz">
+
+    <label for="input-quantity-per-oz">Quantity oz: </label>
+    <input type="number" name="input-quantity-per-oz" id="input-quantity-per-oz">
+
+    <input type="submit">
+</form>
+
+{{!-- form to update customer table using ajax --}}
+<h2>Updating Customer Information</h2>
+<p>To update a specific user's info, select an existing customer, make your changes, and 'submit'.</p>
+<form id="update-customer-form-ajax">
+    <label for="mySelect">Select Customer: </label>
+    <select name="input-raw-material-name" id="mySelect">
+        <option value="test">Select a Customer</option>
+        {{#each data}}
+        <option value="{{this.customer_id}}">{{this.name}}</option>
+        {{/each}}
+    </select>
+    {{!-- ID's must be different than INSERT --}}
+    <label for="input-new-name">New Name: </label>
+    <input type="text" name="input-new-name" id="input-new-name">
+    <label for="update-phone_number">Phone Number: </label>
+    <input type="text" name="update-phone_number" id="update-phone_number">
+    <label for="update-email">Email: </label>
+    <input type="text" name="update-email" id="update-email">
+    <input type="submit" value="Update">
+</form>
+
+<script src="/js/delete_customer.js"></script>
+<script src="/js/update_customer.js"></script>
