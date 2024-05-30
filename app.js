@@ -294,44 +294,18 @@ app.get('/PurchaseOrders', function(req, res) {
     });
 });
 
-app.post('/add-purchase-form-ajax', function(req, res) {
-    // Capture the incoming data and parse it back to a JS object
+/* DELETE Purchase Order */
+app.delete('/delete-purchase-order-ajax/', function(req, res, next) {
     let data = req.body;
-
-    // Extract the incoming data
-    let raw_material_id = data.raw_material_id;
-    let order_oz = parseFloat(data.order_oz);
-    let date_received = data.date_received;
-    let total_cost = parseFloat(data.total_cost);
-
-    // Validate and log if any field is missing
-    if (!raw_material_id || isNaN(order_oz) || !date_received || isNaN(total_cost)) {
-        console.error('One or more fields are missing or invalid.');
-        return res.status(400).send('All fields are required and must be valid.');
-    }
-
-    // Insert the new purchase order into the PurchaseOrders table
-    let queryInsert = `INSERT INTO PurchaseOrders (raw_material_id, total_cost, order_oz, date_received) VALUES (?, ?, ?, ?)`;
-
-    db.pool.query(queryInsert, [raw_material_id, total_cost, order_oz, date_received], function(error, rows, fields) {
+    let purchase_order_id = parseInt(data.id);
+    let delete_purchase_order = `DELETE FROM PurchaseOrders WHERE purchase_id = ?`;
+    db.pool.query(delete_purchase_order, [purchase_order_id], function(error, rows, fields) {
         if (error) {
-            console.log('Error inserting purchase order:', error);
-            return res.sendStatus(400);
+            console.log(error);
+            res.sendStatus(400);
+        } else {
+            res.sendStatus(204);
         }
-
-        // If there was no error, perform a SELECT to get the new purchase order
-        let queryFetchNewRow = `SELECT PurchaseOrders.purchase_id, RawMaterials.material_name, PurchaseOrders.total_cost, PurchaseOrders.order_oz, PurchaseOrders.date_received 
-                                FROM PurchaseOrders 
-                                JOIN RawMaterials ON PurchaseOrders.raw_material_id = RawMaterials.raw_material_id 
-                                WHERE PurchaseOrders.purchase_id = LAST_INSERT_ID()`;
-
-        db.pool.query(queryFetchNewRow, function(error, rows, fields) {
-            if (error) {
-                console.log('Error fetching new row:', error);
-                return res.sendStatus(500);
-            }
-            res.status(200).json(rows);
-        });
     });
 });
 
@@ -369,27 +343,17 @@ app.get('/SalesOrders', function(req, res) {
     });
 });
 
-app.post('/add-sale-form', function(req, res) {
-    // Capture the incoming data and parse it back to a JS object
+/* DELETE Sales Order */
+app.delete('/delete-sales-order-ajax/', function(req, res, next) {
     let data = req.body;
-
-    // Capture NULL values
-    let raw_material_id = data['input-raw-material-id'] ? `'${data['input-raw-material-id']}'` : 'NULL';
-    let total_cost = data['input-total-cost'] ? `'${data['input-total-cost']}'` : 'NULL';
-    let order_oz = data['input-order-oz'] ? `'${data['input-order-oz']}'` : 'NULL';
-    let date_received = data['input-date-received'] ? `'${data['input-date-received']}'` : 'NULL';
-
-    // Create the query and run it on the database
-    query4 = `INSERT INTO PurchaseOrders (raw_material_id, total_cost, order_oz, date_received) VALUES (${raw_material_id}, ${total_cost}, ${order_oz}, ${date_received})`;
-    db.pool.query(query4, function(error, rows, fields) {
-        // Check to see if there was an error
+    let sale_id = parseInt(data.id);
+    let delete_sale_order = `DELETE FROM SalesOrders WHERE sale_id = ?`;
+    db.pool.query(delete_sale_order, [sale_id], function(error, rows, fields) {
         if (error) {
-            // Log the error to the terminal so we know what went wrong, and send the visitor an HTTP response 400 indicating it was a bad request.
             console.log(error);
             res.sendStatus(400);
         } else {
-            // If there was no error, we redirect back to our PurchaseOrders route
-            res.redirect('/PurchaseOrders');
+            res.sendStatus(204);
         }
     });
 });
