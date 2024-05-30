@@ -39,31 +39,27 @@
     </tbody>
 
 </table>
-<script src="./js/delete_raw_material.js"></script>
+{{!-- <script src="./js/delete_raw_material.js"></script> --}}
 
 
-<h2>Search for a Purchase</h2>
-<p>Search by Raw Material using the field below.</p>
+<h2>Add a New Purchase</h2>
+<p>To add a new purchase, please enter the details below and click `Submit`!</p>
+<form id="add-purchase-form-ajax" method="POST" action="/add-purchase-form">
+    <label for="input-raw-material-id">Select Raw Material: </label>
+    <select name="input-raw-material-id" id="input-raw-material-id-1" required>
+        <option value="">Select a Raw Material</option>
+        {{#each data}}
+        <option value="{{this.raw_material_id}}" data-cost-per-oz="{{this.cost_per_oz}}">{{this.material_name}}</option>
+        {{/each}}
+    </select>
 
-<form id="search-raw_material-html" method='GET' action='/PurchaseOrders'>
-    <label for="input-raw_material_name">Search: </label>
-    <input type="text" name="raw_material_name" id="input-raw_material_name">
+    <label for="input-order-oz">Order Oz: </label>
+    <input type="number" name="input-order-oz" id="input-order-oz" required>
     
+    <label for="input-date-received">Date Received: </label>
+    <input type="date" name="input-date-received" id="input-date-received" required>
+
     <input type="submit">
 </form>
 
-{{!-- Form to add a record to Customer table using standard HTML forms --}}
-<h2>Add a New Raw Material</h2>
-<p>To add Raw Material, please enter the details below and click `Submit`!</p>
-<form id="add-raw_material-form" method="POST" action="/add-raw_material-form">
-    <label for="input-raw-material-name">Name: </label>
-    <input type="text" name="input-raw-material-name" id="input-raw-material-name">
-    
-    <label for="input-cost-per-oz">Cost Per Oz: </label>
-    <input type="number" name="input-cost-per-oz" id="input-cost-per-oz">
-
-    <label for="input-quantity-per-oz">Quantity oz: </label>
-    <input type="number" name="input-quantity-per-oz" id="input-quantity-per-oz">
-
-    <input type="submit">
-</form>
+<script src="/js/add_purchase.js"></script>

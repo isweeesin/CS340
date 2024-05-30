@@ -96,7 +96,7 @@ app.post('/add-customer-form', function(req, res){
         // presents it on the screen
         else
         {
-            res.redirect('/');
+            res.redirect('/Customers');
         }
     })
 })
@@ -167,6 +167,69 @@ app.get('/RawMaterials', function(req, res) {
     });
 });
 
+/* CREATE Raw Material */
+app.post('/add-raw_material-form', function(req, res){
+    // Capture the incoming data and parse it back to a JS object
+    let data = req.body;
+
+    // Capture NULL values
+    let cost_per_oz = data['input-cost_per_oz'] ? `'${data['input-cost_per_oz']}'` : 'NULL';
+    let quantity_oz = data['input-quantity_oz'] ? `'${data['input-quantity_oz']}'` : 'NULL';
+    
+
+    // Create the query and run it on the database
+    query2 = `INSERT INTO RawMaterials (material_name, cost_per_oz, quantity_oz) VALUES ('${data['input-material_name']}', ${cost_per_oz}, ${quantity_oz})`;
+    db.pool.query(query2, function(error, rows, fields){
+
+        // Check to see if there was an error
+        if (error) {
+
+            // Log the error to the terminal so we know what went wrong, and send the visitor an HTTP response 400 indicating it was a bad request.
+            console.log(error)
+            res.sendStatus(400);
+        }
+
+        // If there was no error, we redirect back to our root route, which automatically runs the SELECT * FROM cusomters and
+        // presents it on the screen
+        else
+        {
+            res.redirect('/RawMaterials');
+        }
+    })
+})
+
+/* DELETE Raw Material*/
+app.delete('/delete-raw-material-ajax/', function(req, res, next) {
+    let data = req.body;
+    let raw_material_id = parseInt(data.id);
+    let delete_product = `DELETE FROM RawMaterials WHERE raw_material_id = ?`;
+    db.pool.query(delete_product, [raw_material_id], function(error, rows, fields) {
+        if (error) {
+            console.log(error);
+            res.sendStatus(400);
+        } else {
+            res.sendStatus(204);
+        }
+    });
+});
+
+/* UPDATE Raw Material*/
+app.put('/update-raw-material-ajax', function(req, res) {
+    let data = req.body;
+    let query = `UPDATE RawMaterials SET material_name = ?, cost_per_oz = ?, quantity_oz = ? WHERE raw_material_id = ?`;
+    /* use params based on data object from update_customer.js */
+    let params = [data.material_name, data.cost_per_bottle, data.quantity_oz,  data.raw_material_id];
+
+    db.pool.query(query, params, function(error, rows, fields) {
+        if (error) {
+            console.log(error);
+            res.sendStatus(400);
+        } else {
+            res.sendStatus(200);
+        }
+    });
+});
+
 /*
 
     READ Recipes   
@@ -231,6 +294,49 @@ app.get('/PurchaseOrders', function(req, res) {
     });
 });
 
+app.post('/add-purchase-form-ajax', function(req, res) {
+    // Capture the incoming data and parse it back to a JS object
+    let data = req.body;
+
+    // Extract the incoming data
+    let raw_material_id = data.raw_material_id;
+    let order_oz = parseFloat(data.order_oz);
+    let date_received = data.date_received;
+    let total_cost = parseFloat(data.total_cost);
+
+    // Validate and log if any field is missing
+    if (!raw_material_id || isNaN(order_oz) || !date_received || isNaN(total_cost)) {
+        console.error('One or more fields are missing or invalid.');
+        return res.status(400).send('All fields are required and must be valid.');
+    }
+
+    // Insert the new purchase order into the PurchaseOrders table
+    let queryInsert = `INSERT INTO PurchaseOrders (raw_material_id, total_cost, order_oz, date_received) VALUES (?, ?, ?, ?)`;
+
+    db.pool.query(queryInsert, [raw_material_id, total_cost, order_oz, date_received], function(error, rows, fields) {
+        if (error) {
+            console.log('Error inserting purchase order:', error);
+            return res.sendStatus(400);
+        }
+
+        // If there was no error, perform a SELECT to get the new purchase order
+        let queryFetchNewRow = `SELECT PurchaseOrders.purchase_id, RawMaterials.material_name, PurchaseOrders.total_cost, PurchaseOrders.order_oz, PurchaseOrders.date_received 
+                                FROM PurchaseOrders 
+                                JOIN RawMaterials ON PurchaseOrders.raw_material_id = RawMaterials.raw_material_id 
+                                WHERE PurchaseOrders.purchase_id = LAST_INSERT_ID()`;
+
+        db.pool.query(queryFetchNewRow, function(error, rows, fields) {
+            if (error) {
+                console.log('Error fetching new row:', error);
+                return res.sendStatus(500);
+            }
+            res.status(200).json(rows);
+        });
+    });
+});
+
+
+
 /*
 
     READ Sales Orders   
@@ -260,6 +366,31 @@ app.get('/SalesOrders', function(req, res) {
         let SalesOrder = rows;
 
         return res.render('SalesOrders', { data: SalesOrder });
+    });
+});
+
+app.post('/add-sale-form', function(req, res) {
+    // Capture the incoming data and parse it back to a JS object
+    let data = req.body;
+
+    // Capture NULL values
+    let raw_material_id = data['input-raw-material-id'] ? `'${data['input-raw-material-id']}'` : 'NULL';
+    let total_cost = data['input-total-cost'] ? `'${data['input-total-cost']}'` : 'NULL';
+    let order_oz = data['input-order-oz'] ? `'${data['input-order-oz']}'` : 'NULL';
+    let date_received = data['input-date-received'] ? `'${data['input-date-received']}'` : 'NULL';
+
+    // Create the query and run it on the database
+    query4 = `INSERT INTO PurchaseOrders (raw_material_id, total_cost, order_oz, date_received) VALUES (${raw_material_id}, ${total_cost}, ${order_oz}, ${date_received})`;
+    db.pool.query(query4, function(error, rows, fields) {
+        // Check to see if there was an error
+        if (error) {
+            // Log the error to the terminal so we know what went wrong, and send the visitor an HTTP response 400 indicating it was a bad request.
+            console.log(error);
+            res.sendStatus(400);
+        } else {
+            // If there was no error, we redirect back to our PurchaseOrders route
+            res.redirect('/PurchaseOrders');
+        }
     });
 });
 
@@ -295,7 +426,68 @@ app.get('/Products', function(req, res) {
     });
 });
 
+/* CREATE Product */
+app.post('/add-product-form', function(req, res){
+    // Capture the incoming data and parse it back to a JS object
+    let data = req.body;
 
+    // Capture NULL values
+    let flavor = data['input-flavor'] ? `'${data['input-flavor']}'` : 'NULL';
+    let price_per_bottle = data['input-price-per-bottle'] ? `'${data['input-price-per-bottle']}'` : 'NULL';
+    
+
+    // Create the query and run it on the database
+    query1 = `INSERT INTO Products (flavor, price_per_bottle) VALUES ('${data['input-flavor']}', ${price_per_bottle})`;
+    db.pool.query(query1, function(error, rows, fields){
+
+        // Check to see if there was an error
+        if (error) {
+
+            // Log the error to the terminal so we know what went wrong, and send the visitor an HTTP response 400 indicating it was a bad request.
+            console.log(error)
+            res.sendStatus(400);
+        }
+
+        // If there was no error, we redirect back to our root route, which automatically runs the SELECT * FROM cusomters and
+        // presents it on the screen
+        else
+        {
+            res.redirect('/Products');
+        }
+    })
+})
+
+/* DELETE Product*/
+app.delete('/delete-product-ajax/', function(req, res, next) {
+    let data = req.body;
+    let product_id = parseInt(data.id);
+    let delete_product = `DELETE FROM Products WHERE product_id = ?`;
+    db.pool.query(delete_product, [product_id], function(error, rows, fields) {
+        if (error) {
+            console.log(error);
+            res.sendStatus(400);
+        } else {
+            res.sendStatus(204);
+        }
+    });
+});
+
+/* UPDATE Products*/
+app.put('/update-product-ajax', function(req, res) {
+    let data = req.body;
+    let query = `UPDATE Products SET flavor = ?, price_per_bottle = ? WHERE product_id = ?`;
+    /* use params based on data object from update_customer.js */
+    let params = [data.flavor, data.price_per_bottle, data.product_id];
+
+    db.pool.query(query, params, function(error, rows, fields) {
+        if (error) {
+            console.log(error);
+            res.sendStatus(400);
+        } else {
+            res.sendStatus(200);
+        }
+    });
+});
 
 
 /*

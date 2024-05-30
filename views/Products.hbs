@@ -37,7 +37,6 @@
     </tbody>
 
 </table>
-<script src="./js/delete_raw_material.js"></script>
 
 
 <h2>Search Products</h2>
@@ -51,41 +50,36 @@
 </form>
 
 {{!-- Form to add a record to Customer table using standard HTML forms --}}
-<h2>Add a New Raw Material</h2>
-<p>To add Raw Material, please enter the details below and click `Submit`!</p>
-<form id="add-raw_material-form" method="POST" action="/add-raw_material-form">
-    <label for="input-raw-material-name">Name: </label>
-    <input type="text" name="input-raw-material-name" id="input-raw-material-name">
+<h2>Add a New Product</h2>
+<p>To add Product, please enter the details below and click `Submit`!</p>
+<form id="add-product-form" method="POST" action="/add-product-form">
+    <label for="input-flavor">Flavor: </label>
+    <input type="text" name="input-flavor" id="input-flavor">
     
-    <label for="input-cost-per-oz">Cost Per Oz: </label>
-    <input type="number" name="input-cost-per-oz" id="input-cost-per-oz">
-
-    <label for="input-quantity-per-oz">Quantity oz: </label>
-    <input type="number" name="input-quantity-per-oz" id="input-quantity-per-oz">
+    <label for="input-price-per-bottle">Price Per Bottle: </label>
+    <input type="number" name="input-price-per-bottle" id="input-price-per-bottle">
 
     <input type="submit">
 </form>
 
-{{!-- form to update customer table using ajax --}}
-<h2>Updating Customer Information</h2>
-<p>To update a specific user's info, select an existing customer, make your changes, and 'submit'.</p>
-<form id="update-customer-form-ajax">
-    <label for="mySelect">Select Customer: </label>
-    <select name="input-raw-material-name" id="mySelect">
-        <option value="test">Select a Customer</option>
+{{!-- form to update product table using ajax --}}
+<h2>Updating Product Information</h2>
+<p>To update a specific product's info, select an existing flavor, make your changes, and 'submit'.</p>
+<form id="update-product-form-ajax">
+    <label for="mySelect">Select Product: </label>
+    <select name="update-product-name" id="mySelect">
+        <option value="test">Select an ID and flavor</option>
         {{#each data}}
-        <option value="{{this.customer_id}}">{{this.name}}</option>
+        <option value="{{this.product_id}}">{{this.product_id}} : {{this.flavor}}</option>
         {{/each}}
     </select>
     {{!-- ID's must be different than INSERT --}}
-    <label for="input-new-name">New Name: </label>
-    <input type="text" name="input-new-name" id="input-new-name">
-    <label for="update-phone_number">Phone Number: </label>
-    <input type="text" name="update-phone_number" id="update-phone_number">
-    <label for="update-email">Email: </label>
-    <input type="text" name="update-email" id="update-email">
+    <label for="update-flavor">New Flavor Name: </label>
+    <input type="text" name="update-flavor" id="update-flavor">
+    <label for="update-price-per-bottle">Price Per Bottle: </label>
+    <input type="text" name="update-price-per-bottle" id="update-price-per-bottle">
     <input type="submit" value="Update">
 </form>
 
-<script src="/js/delete_customer.js"></script>
-<script src="/js/update_customer.js"></script>
+<script src="/js/delete_product.js"></script>
+<script src="/js/update_product.js"></script>
