@@ -1,5 +1,5 @@
 // Citation for the following function:  delete_customer, deleteRow using ajax
-// Date: 5/22/2024
+// Date: 5/30/2024
 // Adapted from:
 // Starter code for 'Developing in Node.JS'.
 // Source URL: https://canvas.oregonstate.edu/courses/1958399/pages/exploration-developing-in-node-dot-js?module_item_id=24181856
