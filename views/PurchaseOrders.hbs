@@ -1,12 +1,12 @@
 
 {{!-- Just some plain text --}}
-<h1>"The Best" Hot Sauce Purchase Orders page</h1>
+<h1>Purchase Orders</h1>
 <h3><a href="/"> HOME PAGE</a></h3>
 [ <a href="Products">Products</a> | <a href="Customers">Customers</a> | <a href="RawMaterials">Raw Materials</a> | <a href="recipe">Recipe</a> | <a href="PurchaseOrders">Purchase Orders</a> | <a href="SalesOrders">Sales Orders</a>]
 {{!-- data from database  --}}
 
-{{!-- Create Prodcuts table --}}
-<table border="1" cellpadding="5"  id="purchase-order-table">
+{{!-- Create PO table --}}
+<table border="1" cellpadding="5"  id="purchase_orders-table">
 
     {{!-- Header section --}}
     <thead>
@@ -39,26 +39,55 @@
     </tbody>
 
 </table>
+<script src="./js/delete_raw_material.js"></script>
 
 
-<h2>Add a New Purchase</h2>
-<p>To add a new purchase, please enter the details below and click `Submit`!</p>
-<form id="add-purchase-form-ajax" method="POST" action="/add-purchase-form">
-    <label for="input-raw-material-id">Select Raw Material: </label>
-    <select name="input-raw-material-id" id="input-raw-material-id-1" required>
-        <option value="">Select a Raw Material</option>
-        {{#each data}}
-        <option value="{{this.raw_material_id}}" data-cost-per-oz="{{this.cost_per_oz}}">{{this.material_name}}</option>
-        {{/each}}
-    </select>
+<h2>Search for a Purchase</h2>
+<p>Search by Raw Material using the field below.</p>
 
-    <label for="input-order-oz">Order Oz: </label>
-    <input type="number" name="input-order-oz" id="input-order-oz" required>
+<form id="search-raw_material-html" method='GET' action='/PurchaseOrders'>
+    <label for="input-raw_material_name">Search: </label>
+    <input type="text" name="raw_material_name" id="input-raw_material_name">
     
-    <label for="input-date-received">Date Received: </label>
-    <input type="date" name="input-date-received" id="input-date-received" required>
-
     <input type="submit">
 </form>
 
+{{!-- Form to add a record to Customer table using standard HTML forms --}}
+<h2>Add a Purchase Order</h2>
+<p>DOES NOT FUNCTION YET</p>
+{{!<form id="add-raw_material-form" method="POST" action="/add-raw_material-form">
+    <label for="input-raw-material-name">Name: </label>
+    <input type="text" name="input-raw-material-name" id="input-raw-material-name">
+    
+    <label for="input-cost-per-oz">Cost Per Oz: </label>
+    <input type="number" name="input-cost-per-oz" id="input-cost-per-oz">
+
+    <label for="input-quantity-per-oz">Quantity oz: </label>
+    <input type="number" name="input-quantity-per-oz" id="input-quantity-per-oz">
+
+    <input type="submit">
+</form>}}
+
+{{!-- form to update PurchaseOrder table using ajax --}}
+<h2>Edit Purchase Order</h2>
+<p>Update</p>
+<form id="update-po-form-ajax">
+    <label for="mySelect">Select Purchase Order: </label>
+    <select name="update_po_id" id="mySelect">
+        <option value="test">Select</option>
+        {{#each data}}
+        <option value="{{this.purchase_id}}">{{this.purchase_id}}</option>
+        {{/each}}
+    </select>
+    {{!-- ID's must be different than INSERT --}}
+    <label for="input-new-name">New material name: </label>
+    <input type="text" name="input-new-name" id="input-new-name" required>
+    <label for="update-quantity">New quantity in oz: </label>
+    <input type="number" name="update-quantity" id="update-quantity" min="0" required>
+    <label for="update-date">Change date received: </label>
+    <input type="text" name="update-date" id="update-date">
+    <input type="submit" value="Update">
+</form>
+
 <script src="/js/delete_purchase_order.js"></script>
+<script src="/js/update_purchase_order.js"></script>
