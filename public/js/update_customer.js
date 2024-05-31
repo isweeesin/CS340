@@ -1,5 +1,5 @@
 
-// Citation for the following function:  update_customer.js
+// Citation for the following file:  update_customer.js -> eventListener function for submit, ajax request
 // Date: 5/22/2024
 // Based on:
 // Starter code for 'Developing in Node.JS'.
@@ -17,10 +17,20 @@ document.getElementById('update-customer-form-ajax').addEventListener('submit', 
     /* data object, stores values to be used in ajax request */
     let data = {
         customer_id: customerId,
-        name: newName,
-        phone_number: phoneNumber,
-        email: email
     };
+
+    // Add properties to the data object only if the corresponding input field is not empty
+    if (newName) {
+        data.name = newName;
+    }
+    if (phoneNumber) {
+        data.phone_number = phoneNumber;
+    }
+    if (email) {
+        data.email = email;
+    }
+
+
     /* async. request, */
     $.ajax({
         url: '/update-customer-ajax',
