@@ -32,3 +32,9 @@ Source URL: https://canvas.oregonstate.edu/courses/1958399/pages/exploration-dev
 // Date: 5/22/2024
 // Adapted from: Starter code for 'Developing in Node.JS'.
 // Source URL: https://canvas.oregonstate.edu/courses/1958399/pages/exploration-developing-in-node-dot-js?module_item_id=24181856
+
+// Citation for the following function:  delete_purchase_order.js, update_purchase_order.js, delete_raw_material.js, update_raw_material.js, delete_product.js, update_product.js
+// Date: 5/30/2024
+// Adapted from:
+// Starter code for 'Developing in Node.JS'.
+// Source URL: https://canvas.oregonstate.edu/courses/1958399/pages/exploration-developing-in-node-dot-js?module_item_id=24181856
