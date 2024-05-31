@@ -10,9 +10,9 @@ Source URL: https://canvas.oregonstate.edu/courses/1958399/pages/exploration-dev
 
 
 {{!-- Just some plain text --}}
-<h1>"The Best" Hot Sauce Raw Materials table</h1>
+<h1>Customers</h1>
 <h3><a href="/"> HOME PAGE</a></h3>
-[ <a href="Products">Products</a> | <a href="Customers">Customers</a> | <a href="RawMaterials">Raw Materials</a> | <a href="recipe">Recipe</a> | <a href="PurchaseOrders">Purchase Orders</a> | <a href="SalesOrders">Sales Orders</a>]
+[ <a href="/Products">Products</a> | <a href="/Customers">Customers</a> | <a href="/RawMaterials">Raw Materials</a> | <a href="/recipe">Recipe</a> | <a href="/PurchaseOrders">Purchase Orders</a> | <a href="/SalesOrders">Sales Orders</a>]
 {{!-- data from database  --}}
 
 {{!-- Create customers table --}}
@@ -48,6 +48,7 @@ Source URL: https://canvas.oregonstate.edu/courses/1958399/pages/exploration-dev
     </tbody>
 
 </table>
+<script src="./js/delete_customer.js"></script>
 
 
 <h2>Search Customers</h2>
@@ -78,7 +79,7 @@ Source URL: https://canvas.oregonstate.edu/courses/1958399/pages/exploration-dev
 </form>
 {{!-- form to update customer table using ajax --}}
 <h2>Updating Customer Information</h2>
-<p>To update a specific user's info, select an existing customer, make your changes, and 'submit'.</p>
+<p>*Blank values will be left unchanged eventually...</p>
 <form id="update-customer-form-ajax">
     <label for="mySelect">Select Customer: </label>
     <select name="input-name" id="mySelect">
