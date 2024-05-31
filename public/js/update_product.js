@@ -1,6 +1,6 @@
 
-// Citation for the following function:  update_customer.js
-// Date: 5/22/2024
+// Citation for the following file: 
+// Date: 5/30/2024
 // Based on:
 // Starter code for 'Developing in Node.JS'.
 // Source URL: https://canvas.oregonstate.edu/courses/1958399/pages/exploration-developing-in-node-dot-js?module_item_id=24181856
@@ -9,15 +9,16 @@
 document.getElementById('update-product-form-ajax').addEventListener('submit', function(event) {
     event.preventDefault();
 
-    let productID = document.getElementById('mySelect').value;
-    let newFlavor = document.getElementById('update-flavor').value;
-    let newPricePerBottle = document.getElementById('update-price-per-bottle').value;
+    let productId = document.getElementById('mySelect').value;
+    let newFlavor = document.getElementById('input-new-flavor').value;
+    let newProductPrice = document.getElementById('update-product-price').value;
+   
 
     /* data object, stores values to be used in ajax request */
     let data = {
-        product_id: productID,
+        product_id: productId,
         flavor: newFlavor,
-        price_per_bottle: newPricePerBottle
+        price_per_bottle: newProductPrice,
     };
     /* async. request, */
     $.ajax({
@@ -27,7 +28,7 @@ document.getElementById('update-product-form-ajax').addEventListener('submit', f
         contentType: "application/json; charset=utf-8",
         /* sucess/error messages */
         success: function(result) {
-            alert('Customer updated successfully');
+            alert('Product updated successfully');
             location.reload();
         },
         error: function(jqXHR, textStatus, errorThrown) {
