@@ -1,6 +1,6 @@
 
 {{!-- Just some plain text --}}
-<h1>"The Best" Hot Sauce Raw Materials page</h1>
+<h1>Raw Materials</h1>
 <h3><a href="/"> HOME PAGE</a></h3>
 [ <a href="Products">Products</a> | <a href="Customers">Customers</a> | <a href="RawMaterials">Raw Materials</a> | <a href="recipe">Recipe</a> | <a href="PurchaseOrders">Purchase Orders</a> | <a href="SalesOrders">Sales Orders</a>]
 {{!-- data from database  --}}
@@ -38,9 +38,10 @@
     </tbody>
 
 </table>
+<script src="./js/delete_raw_material.js"></script>
 
 
-<h2>Search raw_material</h2>
+<h2>Search Ingredients</h2>
 <p>Search by name using the field below.</p>
 
 <form id="search-raw_material-html" method='GET' action='/RawMaterials'>
@@ -51,39 +52,36 @@
 </form>
 
 {{!-- Form to add a record to raw material table using standard HTML forms --}}
-<h2>Add a New Raw Material</h2>
-<p>To add Raw Material, please enter the details below and click `Submit`!</p>
-<form id="add-raw_material-form" method="POST" action="/add-raw_material-form">
-    <label for="input-material_name">Name: </label>
-    <input type="text" name="input-material_name" id="input-material_name">
+<h2>Add a New Ingredient</h2>
+<p>To add Raw Material, please enter the details below </p>
+<form id="add-raw-material-form" method="POST" action="/add-raw-material-form">
+    <label for="input-raw-material-name">Name: </label>
+    <input type="text" name="input-raw-material-name" id="input-raw-material-name" required>
     
-    <label for="input-cost_per_oz">Cost Per Oz: </label>
-    <input type="number" name="input-cost_per_oz" id="input-cost_per_oz">
-
-    <label for="input-quantity_oz">Quantity oz: </label>
-    <input type="number" name="input-quantity_oz" id="input-quantity_oz">
+    <label for="input-cost-per-oz">Cost Per Oz: </label>
+    <input type="number" name="input-cost-per-oz" id="input-cost-per-oz" min="0" step=".01" required>
 
     <input type="submit">
 </form>
 
-{{!-- form to update product table using ajax --}}
-<h2>Updating Raw Material Information</h2>
-<p>To update a specific Materials's info, select an existing material, make your changes, and 'submit'.</p>
-<form id="update-material-form-ajax">
-    <label for="mySelect">Select Raw Material: </label>
-    <select name="update-material-name" id="mySelect">
-        <option value="test">Select an ID and the material name</option>
+{{!-- form to update rawmaterial table using ajax --}}
+<h2>Edit Ingredient</h2>
+<p>Edit an ingredients price, name or inventory level</p>
+<form id="update-raw-material-form-ajax">
+    <label for="mySelect">Select Ingredient: </label>
+    <select name="input-raw-material-name" id="mySelect">
+        <option value="test">Select</option>
         {{#each data}}
-        <option value="{{this.raw_material_id}}">{{this.raw_material_id}} : {{this.material_name}}</option>
+        <option value="{{this.raw_material_id}}">{{this.material_name}}</option>
         {{/each}}
     </select>
     {{!-- ID's must be different than INSERT --}}
-    <label for="update-material-name">New Material Name: </label>
-    <input type="text" name="update-material-namer" id="update-material-name">
-    <label for="update-cost-per-oz">Cost Per Oz: </label>
-    <input type="text" name="update-cost-per-oz" id="update-cost-per-oz">
-    <label for="update-quantity-oz">Quantity Oz: </label>
-    <input type="text" name="update-quantity-oz" id="update-quantity-oz">
+    <label for="input-new-name">New name: </label>
+    <input type="text" name="input-new-name" id="input-new-name" required>
+    <label for="update-phone_number">New cost per oz: </label>
+    <input type="text" name="update-cost" id="update-cost" required>
+    <label for="update-email">New inventory in ounces: </label>
+    <input type="text" name="update-quantity" id="update-quantity" required>
     <input type="submit" value="Update">
 </form>
 
