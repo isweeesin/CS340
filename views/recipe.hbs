@@ -1,6 +1,6 @@
 
 {{!-- Just some plain text --}}
-<h1>"The Best" Hot Sauce Recipe page</h1>
+<h1>Recipes</h1>
 <h3><a href="/"> HOME PAGE</a></h3>
 [ <a href="Products">Products</a> | <a href="Customers">Customers</a> | <a href="RawMaterials">Raw Materials</a> | <a href="recipe">Recipe</a> | <a href="PurchaseOrders">Purchase Orders</a> | <a href="SalesOrders">Sales Orders</a>]
 {{!-- data from database  --}}
@@ -40,21 +40,12 @@
 <script src="./js/delete_raw_material.js"></script>
 
 
-<h2>Search Products</h2>
-<p>Search by flavor using the field below.</p>
-
-<form id="search-flavor-html" method='GET' action='/recipe'>
-    <label for="input-flavor">Search: </label>
-    <input type="text" name="flavor" id="input-flavor">
-    
-    <input type="submit">
-</form>
 
 {{!-- Form to add a record to Customer table using standard HTML forms --}}
-<h2>Add a New Raw Material</h2>
-<p>To add Raw Material, please enter the details below and click `Submit`!</p>
-<form id="add-raw_material-form" method="POST" action="/add-raw_material-form">
-    <label for="input-raw-material-name">Name: </label>
+<h2>Add Recipe</h2>
+<p>DOES NOT FUNCTION</p>
+{{! <form id="add-raw_material-form" method="POST" action="/add-raw_material-form">
+    <label for="input-raw-material-name">Product Flavor: </label>
     <input type="text" name="input-raw-material-name" id="input-raw-material-name">
     
     <label for="input-cost-per-oz">Cost Per Oz: </label>
@@ -64,4 +55,6 @@
     <input type="number" name="input-quantity-per-oz" id="input-quantity-per-oz">
 
     <input type="submit">
-</form>
+</form>}}
+<h2>Update Recipe</h2>
+<p>DOES NOT FUNCTION</p>
