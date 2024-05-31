@@ -1,6 +1,6 @@
 
 {{!-- Just some plain text --}}
-<h1>"The Best" Hot Sauce Products page</h1>
+<h1>Products</h1>
 <h3><a href="/"> HOME PAGE</a></h3>
 [ <a href="Products">Products</a> | <a href="Customers">Customers</a> | <a href="RawMaterials">Raw Materials</a> | <a href="recipe">Recipe</a> | <a href="PurchaseOrders">Purchase Orders</a> | <a href="SalesOrders">Sales Orders</a>]
 {{!-- data from database  --}}
@@ -37,49 +37,53 @@
     </tbody>
 
 </table>
+<script src="./js/delete_product.js"></script>
 
 
-<h2>Search Products</h2>
-<p>Search by flavor using the field below.</p>
+<h2>Search Flavors</h2>
+<p>Search flavors using the field below.</p>
 
 <form id="search-flavor-html" method='GET' action='/Products'>
-    <label for="input-flavor">Search: </label>
-    <input type="text" name="flavor" id="input-flavor">
+    <label for="search-flavor">Search: </label>
+    <input type="text" name="flavor" id="search-flavor">
     
     <input type="submit">
 </form>
 
-{{!-- Form to add a record to Customer table using standard HTML forms --}}
-<h2>Add a New Product</h2>
-<p>To add Product, please enter the details below and click `Submit`!</p>
+{{!-- Form to add a record to product table using standard HTML forms --}}
+<h2>Add a new sauce:</h2>
+<p style="color:red"> *NOTE* You must create a recipe for your new product on the Recipe page in order for it to be valid for sale! </p>
 <form id="add-product-form" method="POST" action="/add-product-form">
     <label for="input-flavor">Flavor: </label>
-    <input type="text" name="input-flavor" id="input-flavor">
+    <input type="text" name="input-flavor" id="input-flavor" required>
     
-    <label for="input-price-per-bottle">Price Per Bottle: </label>
-    <input type="number" name="input-price-per-bottle" id="input-price-per-bottle">
+    <label for="input-price">Price per Bottle: </label>
+    <input type="number" name="input-price" id="input-price" min="0" step=".01" required>
 
-    <input type="submit">
+    <input type="submit" id="addProductBtn" value = "Add Product">
 </form>
 
+
 {{!-- form to update product table using ajax --}}
-<h2>Updating Product Information</h2>
-<p>To update a specific product's info, select an existing flavor, make your changes, and 'submit'.</p>
+<h2>Make Changes:</h2>
+<p>Update a specific flavor's price or name using the form below.</p>
 <form id="update-product-form-ajax">
-    <label for="mySelect">Select Product: </label>
-    <select name="update-product-name" id="mySelect">
-        <option value="test">Select an ID and flavor</option>
+    <label for="mySelect">Select existing flavor: </label>
+    <select name="input-raw-material-name" id="mySelect">
+        <option value="test">Select</option>
         {{#each data}}
-        <option value="{{this.product_id}}">{{this.product_id}} : {{this.flavor}}</option>
+        <option value="{{this.product_id}}">{{this.flavor}}</option>
         {{/each}}
     </select>
     {{!-- ID's must be different than INSERT --}}
-    <label for="update-flavor">New Flavor Name: </label>
-    <input type="text" name="update-flavor" id="update-flavor">
-    <label for="update-price-per-bottle">Price Per Bottle: </label>
-    <input type="text" name="update-price-per-bottle" id="update-price-per-bottle">
+    <label for="input-new-flavor">New name: </label>
+    <input type="text" name="input-new-flavor" id="input-new-flavor">
+    <label for="update-product-price">Price: </label>
+    <input type="number" name="update-product-price" id="update-product-price" min="0" step=".01">
     <input type="submit" value="Update">
+
 </form>
 
-<script src="/js/delete_product.js"></script>
-<script src="/js/update_product.js"></script>
+<script src="./js/delete_product.js"></script>
+<script src="./js/update_product.js"></script>
+
