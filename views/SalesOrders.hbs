@@ -1,12 +1,12 @@
 
 {{!-- Just some plain text --}}
-<h1>"The Best" Hot Sauce Sales Orders page</h1>
+<h1>Sales Orders</h1>
 <h3><a href="/"> HOME PAGE</a></h3>
 [ <a href="Products">Products</a> | <a href="Customers">Customers</a> | <a href="RawMaterials">Raw Materials</a> | <a href="recipe">Recipe</a> | <a href="PurchaseOrders">Purchase Orders</a> | <a href="SalesOrders">Sales Orders</a>]
 {{!-- data from database  --}}
 
 {{!-- Create Prodcuts table --}}
-<table border="1" cellpadding="5"  id="Sales-order-table">
+<table border="1" cellpadding="5"  id="Sales_orders-table">
 
     {{!-- Header section --}}
     <thead>
@@ -41,6 +41,7 @@
     </tbody>
 
 </table>
+<script src="./js/delete_raw_material.js"></script>
 
 
 <h2>Search for a transaction</h2>
@@ -54,9 +55,9 @@
 </form>
 
 {{!-- Form to add a record to Customer table using standard HTML forms --}}
-<h2>Add a New Raw Material</h2>
-<p>To add Raw Material, please enter the details below and click `Submit`!</p>
-<form id="add-sale-form" method="POST" action="/add-sale-form">
+<h2>Process a Sale</h2>
+<p>DOES NOT FUNCTION</p>
+{{!form id="add-raw_material-form" method="POST" action="/add-raw_material-form">
     <label for="input-raw-material-name">Name: </label>
     <input type="text" name="input-raw-material-name" id="input-raw-material-name">
     
@@ -66,6 +67,6 @@
     <label for="input-quantity-per-oz">Quantity oz: </label>
     <input type="number" name="input-quantity-per-oz" id="input-quantity-per-oz">
 
-    <input type="submit">
-</form>
-<script src="/js/delete_sales_order.js"></script>
+    <input type="submit">}}
+<h2>Update a Sale</h2>
+<p>DOES NOT FUNCTION</p>
