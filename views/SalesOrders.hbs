@@ -1,12 +1,12 @@
 
 {{!-- Just some plain text --}}
-<h1>Sales Orders</h1>
+<h1>"The Best" Hot Sauce Sales Orders page</h1>
 <h3><a href="/"> HOME PAGE</a></h3>
 [ <a href="Products">Products</a> | <a href="Customers">Customers</a> | <a href="RawMaterials">Raw Materials</a> | <a href="recipe">Recipe</a> | <a href="PurchaseOrders">Purchase Orders</a> | <a href="SalesOrders">Sales Orders</a>]
 {{!-- data from database  --}}
 
 {{!-- Create Prodcuts table --}}
-<table border="1" cellpadding="5"  id="Sales_orders-table">
+<table border="1" cellpadding="5"  id="Sales-order-table">
 
     {{!-- Header section --}}
     <thead>
@@ -41,7 +41,6 @@
     </tbody>
 
 </table>
-<script src="./js/delete_raw_material.js"></script>
 
 
 <h2>Search for a transaction</h2>
@@ -54,19 +53,61 @@
 </form>
 </form>
 
-{{!-- Form to add a record to Customer table using standard HTML forms --}}
-<h2>Process a Sale</h2>
-<p>DOES NOT FUNCTION</p>
-{{!form id="add-raw_material-form" method="POST" action="/add-raw_material-form">
-    <label for="input-raw-material-name">Name: </label>
-    <input type="text" name="input-raw-material-name" id="input-raw-material-name">
+<h2>Add a New Transaction</h2>
+<p>To add a new sale, please enter the details below and click `Submit`!</p>
+<form id="add-sale-form" method="POST" action="/add-sale-form">
+    <label for="selectFlavor">Select Flavor: </label>
+    <select name="selectFlavor" id="selectFlavor">
+        <option value="">Select a Flavor</option>
+        {{#each flavors}}
+        <option value="{{this.flavor}}">{{this.product_id}}: {{this.flavor}}</option>
+        {{/each}}
+    </select>
     
-    <label for="input-cost-per-oz">Cost Per Oz: </label>
-    <input type="number" name="input-cost-per-oz" id="input-cost-per-oz">
+    <label for="selectCustomer">Select Customer: </label>
+    <select name="selectCustomer" id="selectCustomer">
+        <option value="">Select a Customer</option>
+        {{#each customers}}
+        <option value="{{this.name}}">{{this.customer_id}}: {{this.name}}</option>
+        {{/each}}
+    </select>
 
-    <label for="input-quantity-per-oz">Quantity oz: </label>
-    <input type="number" name="input-quantity-per-oz" id="input-quantity-per-oz">
+    <label for="input-bottle-quantity">Bottle Quantity: </label>
+    <input type="number" name="input-bottle-quantity" id="input-bottle-quantity">
+    
+    <label for="input-date-shipped">Date Shipped: </label>
+    <input type="date" name="input-date-shipped" id="input-date-shipped">
 
-    <input type="submit">}}
-<h2>Update a Sale</h2>
-<p>DOES NOT FUNCTION</p>
+    <input type="submit" value="Submit">
+</form>
+
+
+
+<h2>Edit Purchase Order</h2>
+<p>Update</p>
+<form id="update-sale-form-ajax">
+    <label for="mySelect">Select Flavor: </label>
+    <select name="update_sale_id" id="mySelect">
+        <option value="test">Select</option>
+        {{#each data}}
+        <option value="{{this.sale_id}}">{{this.sale_id}} : {{this.flavor}}</option>
+        {{/each}}
+    </select>
+
+    <label for="input-new-flavor">New Flavor name: </label>
+    <input type="text" name="input-new-flavor" id="input-new-flavor">
+   
+    <label for="update-customer-name">Cusomter name:  </label>
+    <input type="Text" name="update-customer-name" id="update-customer-name" min="0">
+
+    <label for="update-bottles">Bottles Quantity: </label>
+    <input type="Number" name="update-bottles" id="update-bottles">
+
+    <label for="update-date">Change date shipped: </label>
+    <input type="Date" name="update-date" id="update-date">
+
+    <input type="submit" value="Update">
+</form>
+
+<script src="/js/delete_sales_order.js"></script>
+<script src="/js/update_sales_order.js"></script>

@@ -345,32 +345,227 @@ app.put('/update-po-ajax', function(req, res) {
     });
 });
 /*
+
     READ Sales Orders   
+
 */
 app.get('/SalesOrders', function(req, res) {
-    // Declare Query 5
-    let query5;
-
-    // If there is no query string, we just perform a basic SELECT
-    if (req.query.flavor === undefined) {
-        query5 = "SELECT SalesOrders.sale_id, Products.flavor, Customers.name, SalesOrders.bottle_quantity, SalesOrders.date_shipped, SalesOrders.total_sale, SalesOrders.total_cost FROM SalesOrders LEFT JOIN Products ON SalesOrders.product_id = Products.product_id LEFT JOIN Customers ON SalesOrders.customer_id = Customers.customer_id;";
-    }
-    // If there is a query string, we assume this is a search, and return desired results
-    else {
-        query5 = `SELECT SalesOrders.sale_id, Products.flavor, Customers.name, SalesOrders.bottle_quantity, SalesOrders.date_shipped, SalesOrders.total_sale, SalesOrders.total_cost FROM SalesOrders LEFT JOIN Products ON SalesOrders.product_id = Products.product_id LEFT JOIN Customers ON SalesOrders.customer_id = Customers.customer_id WHERE Products.flavor LIKE "${req.query.flavor}%"`;
-    }
-
-    // Run the 1st query
-    db.pool.query(query5, function(error, rows, fields) {
+    let queryProducts = "SELECT product_id, flavor FROM Products";
+    let queryCustomers = "SELECT customer_id, name FROM Customers";
+    let querySalesOrders = `
+        SELECT SalesOrders.sale_id, Products.flavor, Customers.name, SalesOrders.bottle_quantity, SalesOrders.date_shipped, SalesOrders.total_sale, SalesOrders.total_cost
+        FROM SalesOrders
+        JOIN Products ON SalesOrders.product_id = Products.product_id
+        JOIN Customers ON SalesOrders.customer_id = Customers.customer_id
+    `;
+    
+    db.pool.query(queryProducts, function(error, products, fields) {
         if (error) {
             console.log(error);
             return res.sendStatus(500);
         }
 
-        // Save the customers
-        let SalesOrder = rows;
+        db.pool.query(queryCustomers, function(error, customers, fields) {
+            if (error) {
+                console.log(error);
+                return res.sendStatus(500);
+            }
 
-        return res.render('SalesOrders', { data: SalesOrder });
+            db.pool.query(querySalesOrders, function(error, salesOrders, fields) {
+                if (error) {
+                    console.log(error);
+                    return res.sendStatus(500);
+                }
+
+                console.log('Products:', products);  // Log products to ensure they are not empty
+                console.log('Customers:', customers);  // Log customers to ensure they are not empty
+
+                res.render('SalesOrders', { flavors: products, customers: customers, data: salesOrders });
+            });
+        });
+    });
+});
+
+// CREATE sale
+
+app.post('/add-sale-form', function(req, res) {
+    let data = req.body;
+
+    // Log the received form data for debugging
+    console.log('Form data received:', data);
+
+    let flavor = data.selectFlavor;
+    let name = data.selectCustomer;
+    let bottle_quantity = data['input-bottle-quantity'];
+    let date_shipped = data['input-date-shipped'];
+
+    if (!flavor || !name || !bottle_quantity || !date_shipped) {
+        console.log('Error: One or more fields are missing');
+        return res.status(400).send('All fields are required');
+    }
+
+    // Query to fetch product_id, price_per_bottle, and customer_id
+    let query_fetch_ids = `
+        SELECT 
+            Products.product_id, 
+            Products.price_per_bottle, 
+            Customers.customer_id
+        FROM 
+            Products, 
+            Customers
+        WHERE 
+            Products.flavor = ? 
+            AND Customers.name = ?
+    `;
+
+    db.pool.query(query_fetch_ids, [flavor, name], function(error, results, fields) {
+        if (error) {
+            console.log(error);
+            return res.sendStatus(400);
+        }
+
+        if (results.length === 0) {
+            console.log('Error: No product or customer found with the given flavor and name');
+            return res.status(400).send('No product or customer found');
+        }
+
+        let product_id = results[0].product_id;
+        let price_per_bottle = results[0].price_per_bottle;
+        let customer_id = results[0].customer_id;
+        let total_sale = price_per_bottle * bottle_quantity;
+
+        // Query to fetch the total cost
+        let query_fetch_cost = `
+            SELECT 
+                SUM(RawMaterials.cost_per_oz * Recipes.required_oz) AS total_cost
+            FROM 
+                Recipes
+            JOIN 
+                RawMaterials 
+            ON 
+                Recipes.raw_material_id = RawMaterials.raw_material_id
+            WHERE 
+                Recipes.product_id = ?
+        `;
+
+        db.pool.query(query_fetch_cost, [product_id], function(error, cost_results, fields) {
+            if (error) {
+                console.log(error);
+                return res.sendStatus(400);
+            }
+
+            let total_cost = cost_results[0].total_cost * bottle_quantity;
+
+            // Insert the new sale into the SalesOrders table
+            let query_insert_sale = `
+                INSERT INTO SalesOrders 
+                (product_id, customer_id, bottle_quantity, date_shipped, total_sale, total_cost)
+                VALUES (?, ?, ?, ?, ?, ?)
+            `;
+
+            let params = [product_id, customer_id, bottle_quantity, date_shipped, total_sale, total_cost];
+
+            // Log the query and parameters for debugging
+            console.log('Executing query:', query_insert_sale);
+            console.log('With parameters:', params);
+
+            db.pool.query(query_insert_sale, params, function(error, rows, fields) {
+                if (error) {
+                    console.log('Database error:', error);
+                    return res.sendStatus(400);
+                }
+
+                return res.redirect('/SalesOrders');
+            });
+        });
+    });
+});
+
+
+
+
+
+/* UPDATE Sales Orders */
+app.put('/update-sale-ajax', function(req, res) {
+    let data = req.body;
+    let sale_id = data.sale_id;
+    let flavor_name = data['input-new-flavor'];
+    let customer_name = data['update-customer-name'];
+    let bottle_quantity = data['update-bottles'];
+    let date_shipped = data['update-date'];
+
+    // Fetch the product_id, price_per_bottle and customer_id from the respective tables
+    let query_fetch_ids = `
+        SELECT Products.product_id, Products.price_per_bottle, Customers.customer_id
+        FROM Products, Customers
+        WHERE Products.flavor = ? AND Customers.name = ?
+    `;
+
+    db.pool.query(query_fetch_ids, [flavor_name, customer_name], function(error, result, fields) {
+        if (error) {
+            console.log(error);
+            return res.sendStatus(400);
+        }
+
+        if (result.length === 0) {
+            return res.status(400).send('Flavor or customer not found');
+        }
+
+        let product_id = result[0].product_id;
+        let price_per_bottle = result[0].price_per_bottle;
+        let customer_id = result[0].customer_id;
+
+        let total_sale = price_per_bottle * bottle_quantity;
+
+        // Fetch the raw material costs for the flavor
+        let query_fetch_costs = `
+            SELECT SUM(RawMaterials.cost_per_oz * Recipes.required_oz) AS total_cost
+            FROM Recipes
+            JOIN RawMaterials ON Recipes.raw_material_id = RawMaterials.raw_material_id
+            WHERE Recipes.product_id = ?
+        `;
+
+        db.pool.query(query_fetch_costs, [product_id], function(error, cost_result, fields) {
+            if (error) {
+                console.log(error);
+                return res.sendStatus(400);
+            }
+
+            let total_cost = cost_result[0].total_cost * bottle_quantity;
+
+            // Update the SalesOrders table
+            let query_update_sale = `
+                UPDATE SalesOrders
+                SET product_id = ?, customer_id = ?, bottle_quantity = ?, date_shipped = ?, total_sale = ?, total_cost = ?
+                WHERE sale_id = ?
+            `;
+            let params = [product_id, customer_id, bottle_quantity, date_shipped, total_sale, total_cost, sale_id];
+
+            db.pool.query(query_update_sale, params, function(error, rows, fields) {
+                if (error) {
+                    console.log(error);
+                    return res.sendStatus(400);
+                }
+
+                return res.sendStatus(200);
+            });
+        });
+    });
+});
+
+
+/* DELETE Sales Order */
+app.delete('/delete-sales-order-ajax/', function(req, res, next) {
+    let data = req.body;
+    let sale_id = parseInt(data.id);
+    let delete_sale_order = `DELETE FROM SalesOrders WHERE sale_id = ?`;
+    db.pool.query(delete_sale_order, [sale_id], function(error, rows, fields) {
+        if (error) {
+            console.log(error);
+            res.sendStatus(400);
+        } else {
+            res.sendStatus(204);
+        }
     });
 });
 

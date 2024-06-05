@@ -13,9 +13,9 @@ var mysql = require('mysql')
 var pool = mysql.createPool({
     connectionLimit : 30,
     host            : 'classmysql.engr.oregonstate.edu',
-    user            : 'cs340_wooleybr',
-    password        : '**********',
-    database        : 'cs340_wooleybr'
+    user            : 'cs340_isweesin',
+    password        : '5778',
+    database        : 'cs340_isweesin'
 })
 
 // Check if the database connection is successful
