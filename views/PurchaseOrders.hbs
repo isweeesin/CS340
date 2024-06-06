@@ -25,7 +25,7 @@
     {{!-- Body section --}}
     <tbody>
 
-        {{!-- For each row, print the product_id, , flavor, price per bottle, in order + delete button --}}
+        {{!-- For each row, print the purchase_id, material_name, total_cost, date_received in order + delete button --}}
         {{#each data}}
         <tr data-value="{{this.purchase_id}}">
             <td>{{this.purchase_id}}</td>
@@ -39,11 +39,9 @@
     </tbody>
 
 </table>
-<script src="./js/delete_raw_material.js"></script>
-
 
 <h2>Search for a Purchase</h2>
-<p>Search by Raw Material using the field below.</p>
+<p>Search by ingredient using the field below.</p>
 
 <form id="search-raw_material-html" method='GET' action='/PurchaseOrders'>
     <label for="input-raw_material_name">Search: </label>
@@ -52,21 +50,26 @@
     <input type="submit">
 </form>
 
-{{!-- Form to add a record to Customer table using standard HTML forms --}}
+{{!-- Form to add a record to PurchaseOrder table using standard HTML forms --}}
 <h2>Add a Purchase Order</h2>
-<p>DOES NOT FUNCTION YET</p>
-{{!<form id="add-raw_material-form" method="POST" action="/add-raw_material-form">
-    <label for="input-raw-material-name">Name: </label>
-    <input type="text" name="input-raw-material-name" id="input-raw-material-name">
+<form id="add-purchase-form" method="POST" action="/add-purchase-form">
+    <label for="selectMaterial">Ingredient: </label>
+    <select name="selectMaterial" id="selectMaterial">
+        <option value="">Select an existing ingredient:</option>
+        {{#each ingredients}}
+        <option value="{{this.material_name}}">{{this.raw_material_id}}: {{this.material_name}}</option>
+        {{/each}}
+    </select>
     
-    <label for="input-cost-per-oz">Cost Per Oz: </label>
-    <input type="number" name="input-cost-per-oz" id="input-cost-per-oz">
+    
+    <label for="input-order-oz">Order Oz: </label>
+    <input type="number" name="input-order-oz" id="input-order-oz">
 
-    <label for="input-quantity-per-oz">Quantity oz: </label>
-    <input type="number" name="input-quantity-per-oz" id="input-quantity-per-oz">
+    <label for="input-date-received">Date received: </label>
+    <input type="date" name="input-date-received" id="input-date-received">
 
     <input type="submit">
-</form>}}
+</form>
 
 {{!-- form to update PurchaseOrder table using ajax --}}
 <h2>Edit Purchase Order</h2>
@@ -80,7 +83,7 @@
         {{/each}}
     </select>
     {{!-- ID's must be different than INSERT --}}
-    <label for="input-new-name">New material name: </label>
+    <label for="input-new-name">Change ingredient name: </label>
     <input type="text" name="input-new-name" id="input-new-name" required>
     <label for="update-quantity">New quantity in oz: </label>
     <input type="number" name="update-quantity" id="update-quantity" min="0" required>
