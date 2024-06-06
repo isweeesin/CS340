@@ -320,33 +320,122 @@ app.get('/recipe', function(req, res) {
     READ Purchase Orders   
 */
 app.get('/PurchaseOrders', function(req, res) {
-    // Declare Query 4
-    let query4;
-
-    // If there is no query string, we just perform a basic SELECT
-    if (req.query.raw_material_name === undefined) {
-        query4 = "SELECT PurchaseOrders.purchase_id, RawMaterials.material_name, PurchaseOrders.total_cost, PurchaseOrders.order_oz, PurchaseOrders.date_received FROM PurchaseOrders JOIN RawMaterials ON PurchaseOrders.raw_material_id = RawMaterials.raw_material_id;";
-    }
-    // If there is a query string, we assume this is a search, and return desired results
-    else {
-        query4 = `SELECT PurchaseOrders.purchase_id, RawMaterials.material_name, PurchaseOrders.total_cost, PurchaseOrders.order_oz, PurchaseOrders.date_received FROM PurchaseOrders JOIN RawMaterials ON PurchaseOrders.raw_material_id = RawMaterials.raw_material_id WHERE RawMaterials.material_name LIKE "${req.query.raw_material_name}%"`;
-    }
-
-    // Run the 1st query
-    db.pool.query(query4, function(error, rows, fields) {
+    let queryRawMaterials = "SELECT raw_material_id, material_name FROM RawMaterials";
+    let queryPurchaseOrders = `
+        SELECT PurchaseOrders.purchase_id, RawMaterials.material_name, PurchaseOrders.total_cost, PurchaseOrders.order_oz, PurchaseOrders.date_received
+        FROM PurchaseOrders
+        JOIN RawMaterials ON PurchaseOrders.raw_material_id = RawMaterials.raw_material_id
+    `;
+    
+    db.pool.query(queryRawMaterials, function(error, ingredients, fields) {
         if (error) {
             console.log(error);
             return res.sendStatus(500);
         }
 
-        // Save the customers
-        let PurchaseOrder = rows;
+        db.pool.query(queryPurchaseOrders, function(error, purchaseOrders, fields) {
+            if (error) {
+                console.log(error);
+                return res.sendStatus(500);
+            }
 
-        return res.render('PurchaseOrders', { data: PurchaseOrder });
+            console.log('RawMaterials:', ingredients);  // Log ingredients(RawMaterials) to ensure they are not empty
+            console.log('PurchaseOrders:', purchaseOrders);
+
+            res.render('PurchaseOrders', { ingredients: ingredients, data: purchaseOrders });
+        
+        });
     });
 });
+
+
 /* CREATE Purchase Orders */
-// -> in progress
+app.post('/add-purchase-form', function(req, res) {
+    let data = req.body;
+
+    // Log the received form data for debugging
+    console.log('Form data received:', data);
+
+    let material_name = data.selectMaterial;
+    let order_oz = data['input-order-oz'];
+    let date_received = data['input-date-received'];
+    
+
+    if (!material_name || !order_oz || !date_received) {
+        console.log('Error: One or more fields are missing');
+        return res.status(400).send('All fields are required');
+    }
+
+    // Query to fetch raw_material_id & order_oz from RawMaterials
+    let query_fetch_ids = `
+        SELECT 
+            RawMaterials.raw_material_id, 
+            RawMaterials.cost_per_oz 
+        FROM 
+            RawMaterials
+        WHERE 
+            RawMaterials.material_name = ? 
+    `;
+
+    db.pool.query(query_fetch_ids, [material_name], function(error, results, fields) {
+        if (error) {
+            console.log(error);
+            return res.sendStatus(400);
+        }
+
+        if (results.length === 0) {
+            console.log('Error: No ingredient found with selection');
+            return res.status(400).send('No ingredient found!');
+        }
+
+        let raw_material_id = results[0].raw_material_id;
+        let cost_per_oz = results[0].cost_per_oz;
+        let total_cost = cost_per_oz * order_oz;
+             
+        // Update the RawMaterials qty
+        let query_update_material_qty = `
+            UPDATE RawMaterials
+            SET quantity_oz = quantity_oz + ?
+            WHERE raw_material_id = ? 
+       `;
+
+        // Insert the new sale into the SalesOrders table
+        let query_insert_purchase = `
+            INSERT INTO PurchaseOrders 
+            (raw_material_id, total_cost, order_oz, date_received)
+            VALUES (?, ?, ?, ?)
+        `;
+
+        let params1 = [order_oz, raw_material_id];
+
+        let params = [raw_material_id, total_cost, order_oz, date_received];
+
+        // Log the query and parameters for debugging
+        console.log('Executing query:', query_update_material_qty);
+        console.log('With parameters:', params1);
+
+        db.pool.query(query_update_material_qty, params1, function(error, rows, fields) {
+            if (error) {
+                console.log('Error updating RawMaterial table with PO quantity:', error);
+                return res.sendStatus(400);
+            }
+        });
+
+            // Log the query and parameters for debugging
+            console.log('Executing query:', query_insert_purchase);
+            console.log('With parameters:', params);
+
+            db.pool.query(query_insert_purchase, params, function(error, rows, fields) {
+                if (error) {
+                    console.log('Database error:', error);
+                    return res.sendStatus(400);
+                }
+
+                return res.redirect('/PurchaseOrders');
+            });
+    });
+});
+
 
 /* DELETE Purchase Orders */
 app.delete('/delete-po-ajax', function(req, res) {
