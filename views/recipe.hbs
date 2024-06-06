@@ -40,6 +40,15 @@
 <script src="./js/delete_raw_material.js"></script>
 
 
+<h2>Search for a flavor</h2>
+<p>Search by flavor using the field below.</p>
+<form id="search-flavor-html" method='GET' action='/recipe'>
+    <label for="input-flavor">Search: </label>
+    <input type="text" name="flavor" id="input-flavor">
+    
+    <input type="submit">
+</form>
+</form>
 
 {{!-- Form to add a record to Customer table using standard HTML forms --}}
 <h2>Add Recipe</h2>
@@ -56,5 +65,39 @@
 
     <input type="submit">
 </form>}}
+
 <h2>Update Recipe</h2>
-<p>DOES NOT FUNCTION</p>
+<form id="update-recipe-form-ajax">
+    <label for="mySelect">Select Flavor and Material Name to Change: </label>
+    <select name="update_recipe" id="mySelect">
+        <option value="test">Select</option>
+        {{#each data}}
+        <option value="{{this.sale_id}}">{{this.flavor}}: {{this.material_name}}</option>
+        {{/each}}
+    </select>
+
+    <label for="selectFlavor">Select Flavor: </label>
+    <select name="selectFlavor" id="selectFlavor">
+        <option value="">Select a Flavor</option>
+        {{#each data}}
+        <option value="{{this.flavor}}">{{this.flavor}}</option>
+        {{/each}}
+    </select>
+    
+    <label for="selectMaterial">Select Material: </label>
+    <select name="selectMaterial" id="selectMaterial">
+        <option value="">Select a Material</option>
+        {{#each data}}
+        <option value="{{this.material_name}}">{{this.material_name}}</option>
+        {{/each}}
+    </select>
+
+    <label for="update-oz">Required Oz: </label>
+    <input type="number" name="update-oz" id="update-oz">
+
+    <input type="submit" value="Update">
+</form>
+
+
+
+<script src="/js/update_recipe.js"></script>

@@ -248,6 +248,74 @@ app.get('/recipe', function(req, res) {
     });
 });
 
+  /* UPDATE Recipe */
+  app.put('/update-recipe-ajax', function(req, res) {
+    let data = req.body;
+
+    // Log the received data for debugging
+    console.log('Received data:', data);
+
+    let flavor = data.selectFlavor;
+    let material_name = data.selectMaterial;
+    let required_oz = data['update-oz'];
+
+    if (!flavor || !material_name || !required_oz) {
+        console.log('Error: One or more fields are missing');
+        return res.status(400).send('All fields are required');
+    }
+
+    // Log the query parameters
+    console.log('Flavor:', flavor);
+    console.log('Material Name:', material_name);
+
+    // Fetch product_id and material_id
+    let query_fetch_ids = `
+        SELECT 
+            Products.product_id, 
+            RawMaterials.raw_material_id
+        FROM 
+            Products, 
+            RawMaterials
+        WHERE 
+            Products.flavor = ? 
+            AND RawMaterials.material_name = ?
+    `;
+
+    db.pool.query(query_fetch_ids, [flavor, material_name], function(error, results, fields) {
+        if (error) {
+            console.log(error);
+            return res.sendStatus(400);
+        }
+
+        if (results.length === 0) {
+            console.log('Error: No product or raw material found with the given flavor and material name');
+            return res.status(400).send('No product or raw material found');
+        }
+
+        let product_id = results[0].product_id;
+        let raw_material_id = results[0].raw_material_id;
+
+        // Update the recipe
+        let query_update_recipe = `
+            UPDATE Recipes
+            SET required_oz = ?
+            WHERE product_id = ? AND raw_material_id = ?
+        `;
+
+        let params = [required_oz, product_id, raw_material_id];
+
+        db.pool.query(query_update_recipe, params, function(error, rows, fields) {
+            if (error) {
+                console.log('Database error:', error);
+                return res.sendStatus(400);
+            }
+
+            return res.sendStatus(200);
+        });
+    });
+});
+
+
 /*
     READ Purchase Orders   
 */
