@@ -92,32 +92,26 @@
 
 <h2>Update Recipe</h2>
 <form id="update-recipe-form-ajax">
-    <label for="mySelect">Select Flavor and Material Name to Change: </label>
-    <select name="update_recipe" id="mySelect">
+
+    <label for="select-flavor-update">Select the product and ingredient combination to edit: </label>
+    <select name="select-flavor-update" id="select-flavor-update">
         <option value="test">Select</option>
         {{#each data}}
-        <option value="{{this.sale_id}}">{{this.flavor}}: {{this.material_name}}</option>
+        <option value="{{this.flavor}}">{{this.flavor}}: {{this.material_name}}</option>
         {{/each}}
     </select>
 
-    <label for="selectFlavor">Select Flavor: </label>
-    <select name="selectFlavor" id="selectFlavor">
-        <option value="">Select a Flavor</option>
-        {{#each data}}
-        <option value="{{this.flavor}}">{{this.flavor}}</option>
-        {{/each}}
-    </select>
-    
-    <label for="selectMaterial">Select Material: </label>
-    <select name="selectMaterial" id="selectMaterial">
-        <option value="">Select a Material</option>
-        {{#each data}}
+    <label for="select-material-update">Change ingredient: </label>
+    <select name="select-material-update" id="select-material-update">
+        <option value="">Select existing ingredient</option>
+        {{#each ingredients}}
         <option value="{{this.material_name}}">{{this.material_name}}</option>
         {{/each}}
     </select>
 
-    <label for="update-oz">Required Oz: </label>
-    <input type="number" name="update-oz" id="update-oz">
+    <label for="req-oz-update"> Change Required Oz: </label>
+    <input type="number" name="req-oz-update" id="req-oz-update" min="0" step="1" required>
+
 
     <input type="submit" value="Update">
 </form>
