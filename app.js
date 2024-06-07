@@ -218,37 +218,170 @@ app.put('/update-raw-material-ajax', function(req, res) {
         }
     });
 });
-/*
-    READ Recipes   
-*/
+/* READ Recipes */
 app.get('/recipe', function(req, res) {
-    // Declare Query 3
-    let query3;
+    // Declare Queries to get flavor and material_name
+    let queryRawMaterials = "SELECT raw_material_id, material_name FROM RawMaterials";
+    let queryProducts = "SELECT product_id, flavor FROM Products";
+    let queryRecipe = `
+        SELECT Products.flavor, RawMaterials.material_name, Recipes.required_oz
+        FROM Recipes
+        JOIN Products ON Recipes.product_id = Products.product_id
+        LEFT JOIN RawMaterials ON Recipes.raw_material_id = RawMaterials.raw_material_id
+    `;
 
-    // If there is no query string, we just perform a basic SELECT
-    if (req.query.flavor === undefined) {
-        query3 = "SELECT Products.flavor, RawMaterials.material_name, Recipes.required_oz FROM Recipes JOIN Products ON Recipes.product_id = Products.product_id LEFT JOIN RawMaterials ON Recipes.raw_material_id = RawMaterials.raw_material_id;";
-    }
-    // If there is a query string, we assume this is a search, and return desired results
-    else {
-        query3 = `SELECT Products.flavor, RawMaterials.material_name, Recipes.required_oz FROM Recipes JOIN Products ON Recipes.product_id = Products.product_id LEFT JOIN RawMaterials ON Recipes.raw_material_id = RawMaterials.raw_material_id WHERE flavor LIKE "${req.query.flavor}%"`;
-    }
-
-    // Run the 1st query
-    db.pool.query(query3, function(error, rows, fields) {
+    // get material_names
+    db.pool.query(queryRawMaterials, function(error, ingredients, fields) {
         if (error) {
             console.log(error);
             return res.sendStatus(500);
         }
+        // get flavors
+        db.pool.query(queryProducts, function(error, flavors, fields) {
+            if (error) {
+                console.log(error);
+                return res.sendStatus(500);
+            }
+            // get recipes
+            db.pool.query(queryRecipe, function(error, recipes, fields) {
+                if (error) {
+                    console.log(error);
+                    return res.sendStatus(500);
+                }
 
-        // Save the customers
-        let recipes = rows;
-
-        return res.render('recipe', { data: recipes });
+                res.render('recipe', { ingredients: ingredients, flavors:flavors, data: recipes });
+            });
+        });
     });
 });
 
-  /* UPDATE Recipe */
+/* CREATE Recipe */
+app.post('/add-recipe-form', function(req, res) {
+    let data = req.body;
+
+    // Log the received form data for debugging
+    console.log('Form data received:', data);
+
+
+    let flavor = data.selectProduct;
+    let material_name1 = data.selectMaterial1;
+    let required_oz1 = data['selectOz1']
+    let material_name2 = data.selectMaterial2;
+    let required_oz2 = data['selectOz2'];
+    
+
+    if (!flavor || !material_name1 || !required_oz1 || !material_name2 || !required_oz2) {
+        console.log('Error: One or more fields are missing');
+        return res.status(400).send('All fields are required');
+    }
+
+    // Query to fetch raw_material_id & order_oz from RawMaterials
+    let query_product_id = `
+        SELECT 
+            Products.product_id
+        FROM 
+            Products
+        WHERE 
+            Products.flavor = ? 
+    `;
+
+    // Query to fetch raw_material_id & order_oz from RawMaterials
+    let query_material_id1 = `
+        SELECT 
+            RawMaterials.raw_material_id 
+        FROM 
+            RawMaterials
+        WHERE 
+            RawMaterials.material_name = ? 
+    `;
+
+    // Query to fetch raw_material_id & order_oz from RawMaterials
+    let query_material_id2 = `
+        SELECT 
+            RawMaterials.raw_material_id 
+        FROM 
+            RawMaterials
+        WHERE 
+            RawMaterials.material_name = ? 
+    `;
+
+    // Insert the first record into the Recipe table
+    let query_insert_recipe1 = `
+        INSERT INTO Recipes
+        (product_id, raw_material_id, required_oz)
+        VALUES (?, ?, ?)
+    `;
+
+    // Insert the second record into the Recipe table
+    let query_insert_recipe2 = `
+        INSERT INTO Recipes
+        (product_id, raw_material_id, required_oz)
+        VALUES (?, ?, ?)
+    `;
+
+    db.pool.query(query_product_id, [flavor], function(error, flavorResults, fields) {
+        if (error) {
+            console.log(error);
+            return res.sendStatus(400);
+        }
+
+        if (flavorResults.length === 0) {
+            console.log('Error: No product found with selection');
+            return res.status(400).send('No product found!');
+        }
+
+        let product_id = flavorResults[0].product_id;
+
+        db.pool.query(query_material_id1, [material_name1], function(error, nameResults1, fields) {
+            if (error) {
+                console.log(error);
+                return res.sendStatus(400);
+            }
+    
+            if (nameResults1.length === 0) {
+                console.log('Error: No material found with selection 1');
+                return res.status(400).send('No material found!');
+            }
+    
+            let raw_material_id1 = nameResults1[0].raw_material_id;
+
+            db.pool.query(query_material_id2, [material_name2], function(error, nameResults2, fields) {
+                if (error) {
+                    console.log(error);
+                    return res.sendStatus(400);
+                }
+        
+                if (nameResults2.length === 0) {
+                    console.log('Error: No material found with selection 2');
+                    return res.status(400).send('No material found!');
+                }
+        
+                let raw_material_id2 = nameResults2[0].raw_material_id;
+                let params1 = [product_id, raw_material_id1, required_oz1];
+                let params2 = [product_id, raw_material_id2, required_oz2];
+
+                db.pool.query(query_insert_recipe1, params1, function(error, rows, fields) {
+                    if (error) {
+                        console.log('Database error:', error);
+                        return res.sendStatus(400);
+                    }
+
+                    db.pool.query(query_insert_recipe2, params2, function(error, rows, fields) {
+                        if (error) {
+                            console.log('Database error:', error);
+                            return res.sendStatus(400);
+                        }
+        
+                        return res.redirect('/recipe');
+                    });
+                });
+            });
+        });
+    });        
+});
+
+
+/* UPDATE Recipe */
   app.put('/update-recipe-ajax', function(req, res) {
     let data = req.body;
 
@@ -314,7 +447,6 @@ app.get('/recipe', function(req, res) {
         });
     });
 });
-
 
 /*
     READ Purchase Orders   
