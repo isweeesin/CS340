@@ -5,7 +5,7 @@
 [ <a href="Products">Products</a> | <a href="Customers">Customers</a> | <a href="RawMaterials">Raw Materials</a> | <a href="recipe">Recipe</a> | <a href="PurchaseOrders">Purchase Orders</a> | <a href="SalesOrders">Sales Orders</a>]
 {{!-- data from database  --}}
 
-{{!-- Create Prodcuts table --}}
+{{!-- Create Recipe table --}}
 <table border="1" cellpadding="5"  id="recipe-table">
 
     {{!-- Header section --}}
@@ -25,7 +25,7 @@
     {{!-- Body section --}}
     <tbody>
 
-        {{!-- For each row, print the product_id, , flavor, price per bottle, in order + delete button --}}
+        {{!-- For each row, print the flavor(FK Products), the material_name(FK RawMaterials), and the required_oz --}}
         {{#each data}}
         <tr data-value="{{this.product_id}}">
             <td>{{this.flavor}}</td>
@@ -50,21 +50,45 @@
 </form>
 </form>
 
-{{!-- Form to add a record to Customer table using standard HTML forms --}}
+{{!-- Form to add a record to Recipe table using standard HTML forms --}}
 <h2>Add Recipe</h2>
-<p>DOES NOT FUNCTION</p>
-{{! <form id="add-raw_material-form" method="POST" action="/add-raw_material-form">
-    <label for="input-raw-material-name">Product Flavor: </label>
-    <input type="text" name="input-raw-material-name" id="input-raw-material-name">
-    
-    <label for="input-cost-per-oz">Cost Per Oz: </label>
-    <input type="number" name="input-cost-per-oz" id="input-cost-per-oz">
+<p>Select an existing product(flavor) and the quantities of two ingredients that will be used to manufacture it.</p>
+<p style="color:red"> Note: The product cannot already have a recipe assigned. To change a recipe, use the Update Recipe form below. </p>
+<form id="add-recipe-form" method="POST" action="/add-recipe-form">
 
-    <label for="input-quantity-per-oz">Quantity oz: </label>
-    <input type="number" name="input-quantity-per-oz" id="input-quantity-per-oz">
+    <label for="selectProduct">Product: </label>
+    <select name="selectProduct" id="selectProduct">
+        <option value="">Select an existing product</option>
+        {{#each flavors}}
+        <option value="{{this.flavor}}">{{this.product_id}}: {{this.flavor}}</option>
+        {{/each}}
+    </select>
+
+    
+    <label for="selectMaterial1">Ingredient 1: </label>
+    <select name="selectMaterial1" id="selectMaterial1">
+        <option value="">Select an existing ingredient:</option>
+        {{#each ingredients}}
+        <option value="{{this.material_name}}">{{this.raw_material_id}}: {{this.material_name}}</option>
+        {{/each}}
+    </select>
+    <label for="selectOz1">Required Oz: </label>
+    <input type="number" name="selectOz1" id="selectOz1" min="0" step="1" required>
+
+
+    <label for="selectMaterial2">Ingredient 2: </label>
+    <select name="selectMaterial2" id="selectMaterial2">
+        <option value="">Select an existing ingredient</option>
+        {{#each ingredients}}
+        <option value="{{this.material_name}}">{{this.raw_material_id}}: {{this.material_name}}</option>
+        {{/each}}
+    </select>
+    <label for="selectOz1">Required Oz: </label>
+    <input type="number" name="selectOz2" id="selectOz2" min="0" step="1" required>
+
 
     <input type="submit">
-</form>}}
+</form>
 
 <h2>Update Recipe</h2>
 <form id="update-recipe-form-ajax">
