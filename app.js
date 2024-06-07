@@ -396,7 +396,6 @@ app.post('/add-recipe-form', function(req, res) {
 });
 
 
-/* UPDATE Recipe */
  /* UPDATE Recipe */
   app.put('/update-recipe-ajax', function(req, res) {
     let data = req.body;
@@ -761,9 +760,6 @@ app.get('/SalesOrders', function(req, res) {
                     console.log(error);
                     return res.sendStatus(500);
                 }
-
-                console.log('Products:', products);  // Log products to ensure they are not empty
-                console.log('Customers:', customers);  // Log customers to ensure they are not empty
 
                 res.render('SalesOrders', { flavors: products, customers: customers, data: salesOrders });
             });

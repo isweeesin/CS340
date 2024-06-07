@@ -14,11 +14,11 @@
         {{!-- For just the first row, we print each key of the row object as a header cell so we
         know what each column means when the page renders --}}
         <tr>
-            {{#each data.[0]}}
-            <th>
-                {{@key}}
-            </th>
-            {{/each}}
+            <th>Purchase ID</th>
+            <th>Raw Material Name</th>
+            <th>Total Cost</th>
+            <th>Order Oz </th>
+            <th>Date Received</th>
         </tr>
     </thead>
 
@@ -30,10 +30,9 @@
         <tr data-value="{{this.purchase_id}}">
             <td>{{this.purchase_id}}</td>
             <td>{{this.material_name}}</td>
-            <td>{{this.total_cost}}</td>
+            <td>${{this.total_cost}}</td>
             <td>{{this.order_oz}}</td>
             <td>{{this.date_received}}</td>
-            <td><button onclick="deletePurchaseOrder({{this.purchase_id}})">Delete</button></td>
         </tr>
         {{/each}}
     </tbody>
@@ -92,5 +91,4 @@
     <input type="submit" value="Update">
 </form>
 
-<script src="/js/delete_purchase_order.js"></script>
 <script src="/js/update_purchase_order.js"></script>

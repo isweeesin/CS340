@@ -14,11 +14,9 @@
         {{!-- For just the first row, we print each key of the row object as a header cell so we
         know what each column means when the page renders --}}
         <tr>
-            {{#each data.[0]}}
-            <th>
-                {{@key}}
-            </th>
-            {{/each}}
+            <th>Flavor</th>
+            <th>Raw Material Name</th>
+            <th>Required Oz</th>
         </tr>
     </thead>
 
@@ -31,13 +29,11 @@
             <td>{{this.flavor}}</td>
             <td>{{this.material_name}}</td>
             <td>{{this.required_oz}}</td>
-            <td><button onclick="deleteRecipe({{this.product_id}})">Delete</button></td>
         </tr>
         {{/each}}
     </tbody>
 
 </table>
-<script src="./js/delete_raw_material.js"></script>
 
 
 <h2>Search for a flavor</h2>

@@ -24,11 +24,10 @@ Source URL: https://canvas.oregonstate.edu/courses/1958399/pages/exploration-dev
         {{!-- For just the first row, we print each key of the row object as a header cell so we
         know what each column means when the page renders --}}
         <tr>
-            {{#each data.[0]}}
-            <th>
-                {{@key}}
-            </th>
-            {{/each}}
+            <th>Customer ID</th>
+            <th>Customer Name</th>
+            <th>Phone Number</th>
+            <th>Email</th>
         </tr>
     </thead>
 
