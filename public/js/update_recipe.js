@@ -12,9 +12,9 @@ document.addEventListener('DOMContentLoaded', function() {
         form.addEventListener('submit', function(event) {
             event.preventDefault();
 
-            let selectFlavor = document.getElementById('selectFlavor').value;
-            let selectMaterial = document.getElementById('selectMaterial').value;
-            let updateOz = document.getElementById('update-oz').value;
+            let selectFlavor = document.getElementById('select-flavor-update').value;
+            let selectMaterial = document.getElementById('select-material-update').value;
+            let updateOz = document.getElementById('req-oz-update').value;
 
             let data = {
                 selectFlavor: selectFlavor,
