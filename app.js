@@ -223,12 +223,27 @@ app.get('/recipe', function(req, res) {
     // Declare Queries to get flavor and material_name
     let queryRawMaterials = "SELECT raw_material_id, material_name FROM RawMaterials";
     let queryProducts = "SELECT product_id, flavor FROM Products";
-    let queryRecipe = `
+    let queryRecipe;
+
+     // If there is no query string, we just perform a basic SELECT
+     if (req.query.flavor === undefined) {
+        queryRecipe = `
         SELECT Products.flavor, RawMaterials.material_name, Recipes.required_oz
         FROM Recipes
         JOIN Products ON Recipes.product_id = Products.product_id
         LEFT JOIN RawMaterials ON Recipes.raw_material_id = RawMaterials.raw_material_id
     `;
+    }
+    // If there is a query string, we assume this is a search, and return desired results
+    else {
+        queryRecipe = `
+        SELECT Products.flavor, RawMaterials.material_name, Recipes.required_oz
+        FROM Recipes
+        JOIN Products ON Recipes.product_id = Products.product_id
+        LEFT JOIN RawMaterials ON Recipes.raw_material_id = RawMaterials.raw_material_id
+        WHERE flavor LIKE "${req.query.flavor}%"
+    `;
+    }
 
     // get material_names
     db.pool.query(queryRawMaterials, function(error, ingredients, fields) {
@@ -505,11 +520,25 @@ app.post('/add-recipe-form', function(req, res) {
 */
 app.get('/PurchaseOrders', function(req, res) {
     let queryRawMaterials = "SELECT raw_material_id, material_name FROM RawMaterials";
-    let queryPurchaseOrders = `
+    let queryPurchaseOrders;
+
+     // If there is no query string, we just perform a basic SELECT
+     if (req.query.raw_material_name === undefined) {
+        queryPurchaseOrders = `
         SELECT PurchaseOrders.purchase_id, RawMaterials.material_name, PurchaseOrders.total_cost, PurchaseOrders.order_oz, PurchaseOrders.date_received
         FROM PurchaseOrders
         JOIN RawMaterials ON PurchaseOrders.raw_material_id = RawMaterials.raw_material_id
     `;
+    }
+    // If there is a query string, we assume this is a search, and return desired results
+    else {
+        queryPurchaseOrders = `
+        SELECT PurchaseOrders.purchase_id, RawMaterials.material_name, PurchaseOrders.total_cost, PurchaseOrders.order_oz, PurchaseOrders.date_received
+        FROM PurchaseOrders
+        JOIN RawMaterials ON PurchaseOrders.raw_material_id = RawMaterials.raw_material_id
+        WHERE material_name LIKE "${req.query.raw_material_name}%"
+    `;
+    }
     
     db.pool.query(queryRawMaterials, function(error, ingredients, fields) {
         if (error) {
@@ -685,20 +714,35 @@ app.put('/update-po-ajax', function(req, res) {
         });
     });
 });
+
+
 /*
-
     READ Sales Orders   
-
 */
 app.get('/SalesOrders', function(req, res) {
     let queryProducts = "SELECT product_id, flavor FROM Products";
     let queryCustomers = "SELECT customer_id, name FROM Customers";
-    let querySalesOrders = `
+    let querySalesOrders;
+
+     // If there is no query string, we just perform a basic SELECT
+     if (req.query.flavor === undefined) {
+        querySalesOrders = `
         SELECT SalesOrders.sale_id, Products.flavor, Customers.name, SalesOrders.bottle_quantity, SalesOrders.date_shipped, SalesOrders.total_sale, SalesOrders.total_cost
         FROM SalesOrders
         JOIN Products ON SalesOrders.product_id = Products.product_id
         JOIN Customers ON SalesOrders.customer_id = Customers.customer_id
     `;
+    }
+    // If there is a query string, we assume this is a search, and return desired results
+    else {
+        querySalesOrders = `
+        SELECT SalesOrders.sale_id, Products.flavor, Customers.name, SalesOrders.bottle_quantity, SalesOrders.date_shipped, SalesOrders.total_sale, SalesOrders.total_cost
+        FROM SalesOrders
+        JOIN Products ON SalesOrders.product_id = Products.product_id
+        JOIN Customers ON SalesOrders.customer_id = Customers.customer_id
+        WHERE flavor LIKE "${req.query.flavor}%"
+    `;
+    }
     
     db.pool.query(queryProducts, function(error, products, fields) {
         if (error) {
