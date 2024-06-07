@@ -382,68 +382,120 @@ app.post('/add-recipe-form', function(req, res) {
 
 
 /* UPDATE Recipe */
+ /* UPDATE Recipe */
   app.put('/update-recipe-ajax', function(req, res) {
     let data = req.body;
 
+    
     // Log the received data for debugging
     console.log('Received data:', data);
 
     let flavor = data.selectFlavor;
-    let material_name = data.selectMaterial;
+    let new_material_name = data.selectMaterial;
     let required_oz = data['update-oz'];
 
-    if (!flavor || !material_name || !required_oz) {
-        console.log('Error: One or more fields are missing');
+
+
+    if (!flavor || !new_material_name || !required_oz) {
+       console.log('Error: One or more fields are missing');
         return res.status(400).send('All fields are required');
     }
 
     // Log the query parameters
     console.log('Flavor:', flavor);
-    console.log('Material Name:', material_name);
+    console.log('Material Name:', new_material_name);
 
-    // Fetch product_id and material_id
-    let query_fetch_ids = `
-        SELECT 
-            Products.product_id, 
-            RawMaterials.raw_material_id
-        FROM 
-            Products, 
-            RawMaterials
-        WHERE 
-            Products.flavor = ? 
-            AND RawMaterials.material_name = ?
+    // Fetch selected flavor raw_material_id
+    let query_prod_id = `
+    SELECT 
+        product_id
+    FROM 
+        Products
+    WHERE 
+        flavor = ?
     `;
 
-    db.pool.query(query_fetch_ids, [flavor, material_name], function(error, results, fields) {
+    // Log the query and parameters for debugging
+    console.log('Executing query:', query_prod_id);
+    console.log('With parameters:', flavor);
+
+    db.pool.query(query_prod_id, [flavor], function(error, flavorResults, fields) {
         if (error) {
             console.log(error);
             return res.sendStatus(400);
         }
 
-        if (results.length === 0) {
+        if (flavorResults.length === 0) {
             console.log('Error: No product or raw material found with the given flavor and material name');
             return res.status(400).send('No product or raw material found');
         }
 
-        let product_id = results[0].product_id;
-        let raw_material_id = results[0].raw_material_id;
-
-        // Update the recipe
-        let query_update_recipe = `
-            UPDATE Recipes
-            SET required_oz = ?
-            WHERE product_id = ? AND raw_material_id = ?
+        let product_id = flavorResults[0].product_id;
+        
+        // Fetch current raw_material_id based on product_id
+        let query_mat_id = `
+            SELECT 
+                raw_material_id
+            FROM 
+                Recipes
+            WHERE 
+                product_id = ?
         `;
 
-        let params = [required_oz, product_id, raw_material_id];
-
-        db.pool.query(query_update_recipe, params, function(error, rows, fields) {
+        db.pool.query(query_mat_id, [product_id], function(error, recipeResults, fields) {
             if (error) {
-                console.log('Database error:', error);
+                console.log(error);
                 return res.sendStatus(400);
             }
 
-            return res.sendStatus(200);
+            if (recipeResults.length === 0) {
+                console.log('Error: No raw material found with the given name');
+                return res.status(400).send('No raw material found');
+            }
+
+            let current_mat_id = recipeResults[0].raw_material_id;
+
+            // Fetch new raw_material_id based on new_material_name
+            let query_new_mat_id = `
+                SELECT 
+                    raw_material_id
+                FROM 
+                    RawMaterials
+                WHERE 
+                    material_name = ?
+            `;
+
+            db.pool.query(query_new_mat_id, [new_material_name], function(error, materialResults, fields) {
+                if (error) {
+                    console.log(error);
+                    return res.sendStatus(400);
+                }
+
+                if (materialResults.length === 0) {
+                    console.log('Error: No raw material found with the given name');
+                    return res.status(400).send('No raw material found');
+                }
+
+                let new_mat_id = materialResults[0].raw_material_id;
+
+                // Update the recipe
+                let query_update_recipe = `
+                UPDATE Recipes
+                SET required_oz = ?, raw_material_id = ?
+                WHERE product_id = ? AND raw_material_id = ?
+                `;
+
+                let params = [required_oz, new_mat_id, product_id, current_mat_id];
+
+                db.pool.query(query_update_recipe, params, function(error, rows, fields) {
+                    if (error) {
+                        console.log('Database error:', error);
+                        return res.sendStatus(400);
+                    }
+
+                    return res.sendStatus(200);
+                });
+            });
         });
     });
 });
