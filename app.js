@@ -850,17 +850,44 @@ app.post('/add-sale-form', function(req, res) {
 
             let params = [product_id, customer_id, bottle_quantity, date_shipped, total_sale, total_cost];
 
-            // Log the query and parameters for debugging
-            console.log('Executing query:', query_insert_sale);
-            console.log('With parameters:', params);
-
             db.pool.query(query_insert_sale, params, function(error, rows, fields) {
                 if (error) {
                     console.log('Database error:', error);
                     return res.sendStatus(400);
                 }
-
+                    // Update the quantity of each raw material used in the order
+                    let query_fetch_recipe = `
+                    SELECT raw_material_id, required_oz
+                    FROM Recipes
+                    WHERE product_id = ?
+                `;
+                db.pool.query(query_fetch_recipe, [product_id], function(error, recipe_results, fields) {
+                    if (error) {
+                        console.log(error);
+                        return res.sendStatus(400);
+                    }
+                        // Deduct the required quantity from each raw material
+                        recipe_results.forEach(function(recipe) {
+                            let total_oz_used = recipe.required_oz * bottle_quantity;
+    
+                            let query_update_material_qty = `
+                                UPDATE RawMaterials
+                                SET quantity_oz = quantity_oz - ?
+                                WHERE raw_material_id = ?
+                            `;
+    
+                            db.pool.query(query_update_material_qty, [total_oz_used, recipe.raw_material_id], function(error, update_results, fields) {
+                                if (error) {
+                                    console.log(error);
+                                    return res.sendStatus(400);
+                                }
+    
+                                console.log(`Updated RawMaterial ${recipe.raw_material_id} by deducting ${total_oz_used} oz`);
+                            });
+                        });
+                
                 return res.redirect('/SalesOrders');
+                });
             });
         });
     });
@@ -876,63 +903,122 @@ app.put('/update-sale-ajax', function(req, res) {
     let sale_id = data.sale_id;
     let flavor_name = data['input-new-flavor'];
     let customer_name = data['update-customer-name'];
-    let bottle_quantity = data['update-bottles'];
+    let new_bottle_quantity = parseInt(data['update-bottles']);
     let date_shipped = data['update-date'];
 
-    // Fetch the product_id, price_per_bottle and customer_id from the respective tables
-    let query_fetch_ids = `
-        SELECT Products.product_id, Products.price_per_bottle, Customers.customer_id
-        FROM Products, Customers
-        WHERE Products.flavor = ? AND Customers.name = ?
+    // Fetch the old bottle 
+    let query_fetch_old = `
+        SELECT SalesOrders.bottle_quantity, Products.product_id
+        FROM SalesOrders
+        JOIN Products ON SalesOrders.product_id = Products.product_id
+        WHERE SalesOrders.sale_id = ?
     `;
 
-    db.pool.query(query_fetch_ids, [flavor_name, customer_name], function(error, result, fields) {
+    db.pool.query(query_fetch_old, [sale_id], function(error, old_results, fields) {
         if (error) {
             console.log(error);
             return res.sendStatus(400);
         }
 
-        if (result.length === 0) {
-            return res.status(400).send('Flavor or customer not found');
+        if (old_results.length === 0) {
+            return res.status(400).send('Sale order not found');
         }
 
-        let product_id = result[0].product_id;
-        let price_per_bottle = result[0].price_per_bottle;
-        let customer_id = result[0].customer_id;
+        let old_bottle_quantity = old_results[0].bottle_quantity;
+        let product_id = old_results[0].product_id;
 
-        let total_sale = price_per_bottle * bottle_quantity;
-
-        // Fetch the raw material costs for the flavor
-        let query_fetch_costs = `
-            SELECT SUM(RawMaterials.cost_per_oz * Recipes.required_oz) AS total_cost
-            FROM Recipes
-            JOIN RawMaterials ON Recipes.raw_material_id = RawMaterials.raw_material_id
-            WHERE Recipes.product_id = ?
+        // Fetch the product_id, price_per_bottle and customer_id from the respective tables
+        let query_fetch_ids = `
+            SELECT Products.product_id, Products.price_per_bottle, Customers.customer_id
+            FROM Products, Customers
+            WHERE Products.flavor = ? AND Customers.name = ?
         `;
 
-        db.pool.query(query_fetch_costs, [product_id], function(error, cost_result, fields) {
+        db.pool.query(query_fetch_ids, [flavor_name, customer_name], function(error, result, fields) {
             if (error) {
                 console.log(error);
                 return res.sendStatus(400);
             }
 
-            let total_cost = cost_result[0].total_cost * bottle_quantity;
+            if (result.length === 0) {
+                return res.status(400).send('Flavor or customer not found');
+            }
 
-            // Update the SalesOrders table
-            let query_update_sale = `
-                UPDATE SalesOrders
-                SET product_id = ?, customer_id = ?, bottle_quantity = ?, date_shipped = ?, total_sale = ?, total_cost = ?
-                WHERE sale_id = ?
+            let product_id = result[0].product_id;
+            let price_per_bottle = result[0].price_per_bottle;
+            let customer_id = result[0].customer_id;
+
+            let total_sale = price_per_bottle * new_bottle_quantity;
+
+            // Fetch the raw material costs 
+            let query_fetch_costs = `
+                SELECT SUM(RawMaterials.cost_per_oz * Recipes.required_oz) AS total_cost
+                FROM Recipes
+                JOIN RawMaterials ON Recipes.raw_material_id = RawMaterials.raw_material_id
+                WHERE Recipes.product_id = ?
             `;
-            let params = [product_id, customer_id, bottle_quantity, date_shipped, total_sale, total_cost, sale_id];
 
-            db.pool.query(query_update_sale, params, function(error, rows, fields) {
+            db.pool.query(query_fetch_costs, [product_id], function(error, cost_result, fields) {
                 if (error) {
                     console.log(error);
                     return res.sendStatus(400);
                 }
 
-                return res.sendStatus(200);
+                let total_cost = cost_result[0].total_cost * new_bottle_quantity;
+
+                // Update the SalesOrders table
+                let query_update_sale = `
+                    UPDATE SalesOrders
+                    SET product_id = ?, customer_id = ?, bottle_quantity = ?, date_shipped = ?, total_sale = ?, total_cost = ?
+                    WHERE sale_id = ?
+                `;
+                let params = [product_id, customer_id, new_bottle_quantity, date_shipped, total_sale, total_cost, sale_id];
+
+                db.pool.query(query_update_sale, params, function(error, rows, fields) {
+                    if (error) {
+                        console.log(error);
+                        return res.sendStatus(400);
+                    }
+
+                    // Calculate the difference in bottle quantity
+                    let bottle_difference = new_bottle_quantity - old_bottle_quantity;
+
+                    // Fetch the raw material usage for the product
+                    let query_fetch_recipe = `
+                        SELECT raw_material_id, required_oz
+                        FROM Recipes
+                        WHERE product_id = ?
+                    `;
+
+                    db.pool.query(query_fetch_recipe, [product_id], function(error, recipe_results, fields) {
+                        if (error) {
+                            console.log(error);
+                            return res.sendStatus(400);
+                        }
+
+                        // Adjust the quantity of each raw material based on the difference
+                        recipe_results.forEach(function(recipe) {
+                            let total_oz_used = recipe.required_oz * bottle_difference;
+
+                            let query_update_material_qty = `
+                                UPDATE RawMaterials
+                                SET quantity_oz = quantity_oz - ?
+                                WHERE raw_material_id = ?
+                            `;
+
+                            db.pool.query(query_update_material_qty, [total_oz_used, recipe.raw_material_id], function(error, update_results, fields) {
+                                if (error) {
+                                    console.log(error);
+                                    return res.sendStatus(400);
+                                }
+
+                                console.log(`Updated RawMaterial ${recipe.raw_material_id} by adjusting ${total_oz_used} oz`);
+                            });
+                        });
+
+                        res.sendStatus(200);
+                    });
+                });
             });
         });
     });
