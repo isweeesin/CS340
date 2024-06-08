@@ -5,14 +5,11 @@
 [ <a href="Products">Products</a> | <a href="Customers">Customers</a> | <a href="RawMaterials">Raw Materials</a> | <a href="recipe">Recipe</a> | <a href="PurchaseOrders">Purchase Orders</a> | <a href="SalesOrders">Sales Orders</a>]
 {{!-- data from database  --}}
 
-{{!-- Create Prodcuts table --}}
+{{!-- Create SO table --}}
 <table border="1" cellpadding="5"  id="Sales-order-table">
 
     {{!-- Header section --}}
     <thead>
-
-        {{!-- For just the first row, we print each key of the row object as a header cell so we
-        know what each column means when the page renders --}}
         <tr>
             <th>Sale ID</th>
             <th>Flavor</th>
@@ -44,7 +41,7 @@
 </table>
 
 
-<h2>Search for a transaction</h2>
+<h2>Search a transaction...</h2>
 <p>Search by flavor using the field below.</p>
 <form id="search-flavor-html" method='GET' action='/SalesOrders'>
     <label for="input-flavor">Search: </label>
@@ -54,14 +51,14 @@
 </form>
 </form>
 
-<h2>Add a New Transaction</h2>
-<p>To add a new sale, please enter the details below and click `Submit`!</p>
+<h2>Add a new transaction...</h2>
+<p><strong>NOTE: Sale will not process unless there is enough raw material on hand to manufacture the product.</strong></p>
 <form id="add-sale-form" method="POST" action="/add-sale-form">
     <label for="selectFlavor">Select Flavor: </label>
     <select name="selectFlavor" id="selectFlavor">
         <option value="">Select a Flavor</option>
         {{#each flavors}}
-        <option value="{{this.flavor}}">{{this.product_id}}: {{this.flavor}}</option>
+        <option value="{{this.flavor}}">{{this.flavor}}</option>
         {{/each}}
     </select>
     
@@ -69,7 +66,7 @@
     <select name="selectCustomer" id="selectCustomer">
         <option value="">Select a Customer</option>
         {{#each customers}}
-        <option value="{{this.name}}">{{this.customer_id}}: {{this.name}}</option>
+        <option value="{{this.name}}">{{this.name}}</option>
         {{/each}}
     </select>
 
@@ -84,8 +81,7 @@
 
 
 
-<h2>Edit Sale Order</h2>
-<p>Update</p>
+<h2>Edit transaction...</h2>
 <form id="update-sale-form-ajax">
     <label for="mySelect">Select Flavor: </label>
     <select name="update_sale_id" id="mySelect">
@@ -110,4 +106,5 @@
     <input type="submit" value="Update">
 </form>
 
+<script src="/js/delete_sales_order.js"></script>
 <script src="/js/update_sales_order.js"></script>
