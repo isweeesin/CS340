@@ -17,7 +17,7 @@
             <th>Raw Material ID</th>
             <th>Raw Material Name</th>
             <th>Cost Per Oz</th>
-            <th>Quantity Oz</th>
+            <th>Total Inventory Oz</th>
         </tr>
     </thead>
 
@@ -36,10 +36,11 @@
     </tbody>
 
 </table>
+<script src="./js/delete_raw_material.js"></script>
 
 
-<h2>Search Ingredients</h2>
-<p>Search by name using the field below.</p>
+<h2>Search materials...</h2>
+<p>Search by material name using the field below.</p>
 
 <form id="search-raw_material-html" method='GET' action='/RawMaterials'>
     <label for="input-material_name">Search: </label>
@@ -49,8 +50,9 @@
 </form>
 
 {{!-- Form to add a record to raw material table using standard HTML forms --}}
-<h2>Add a New Ingredient</h2>
-<p>To add Raw Material, please enter the details below </p>
+<h2>Set up a material...</h2>
+<p>Please enter an ingredient name and its cost per ounce.</p>
+<p><strong>NOTE: Your new material can be ordered on the Purchase Orders page. </strong></p>
 <form id="add-raw-material-form" method="POST" action="/add-raw-material-form">
     <label for="input-raw-material-name">Name: </label>
     <input type="text" name="input-raw-material-name" id="input-raw-material-name" required>
@@ -62,7 +64,7 @@
 </form>
 
 {{!-- form to update rawmaterial table using ajax --}}
-<h2>Edit Ingredient</h2>
+<h2>Edit a material...</h2>
 <p>Edit an ingredients price, name or inventory level</p>
 <form id="update-raw-material-form-ajax">
     <label for="mySelect">Select Ingredient: </label>
