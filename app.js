@@ -767,8 +767,9 @@ app.get('/SalesOrders', function(req, res) {
     });
 });
 
-// CREATE sale
-
+/*
+    Create Sales Order   
+*/
 app.post('/add-sale-form', function(req, res) {
     let data = req.body;
 
@@ -837,61 +838,115 @@ app.post('/add-sale-form', function(req, res) {
 
             let total_cost = cost_results[0].total_cost * bottle_quantity;
 
-            // Insert the new sale into the SalesOrders table
-            let query_insert_sale = `
-                INSERT INTO SalesOrders 
-                (product_id, customer_id, bottle_quantity, date_shipped, total_sale, total_cost)
-                VALUES (?, ?, ?, ?, ?, ?)
+            // Fetch the required quantities of raw materials for the selected product
+            let query_fetch_recipe = `
+                SELECT raw_material_id, required_oz
+                FROM Recipes
+                WHERE product_id = ?
             `;
 
-            let params = [product_id, customer_id, bottle_quantity, date_shipped, total_sale, total_cost];
-
-            db.pool.query(query_insert_sale, params, function(error, rows, fields) {
+            db.pool.query(query_fetch_recipe, [product_id], function(error, recipe_results, fields) {
                 if (error) {
-                    console.log('Database error:', error);
+                    console.log(error);
                     return res.sendStatus(400);
                 }
-                    // Update the quantity of each raw material used in the order
-                    let query_fetch_recipe = `
-                    SELECT raw_material_id, required_oz
-                    FROM Recipes
-                    WHERE product_id = ?
-                `;
-                db.pool.query(query_fetch_recipe, [product_id], function(error, recipe_results, fields) {
-                    if (error) {
+
+                // Check if there is enough quantity for each raw material
+                let enoughQuantity = true;
+                let rawMaterialsToUpdate = [];
+
+                function checkQuantity(recipe, callback) {
+                    let total_oz_required = recipe.required_oz * bottle_quantity;
+
+                    let query_check_quantity = `
+                        SELECT quantity_oz
+                        FROM RawMaterials
+                        WHERE raw_material_id = ?
+                    `;
+
+                    db.pool.query(query_check_quantity, [recipe.raw_material_id], function(error, quantity_results, fields) {
+                        if (error) {
+                            console.log(error);
+                            callback(error, null);
+                            return;
+                        }
+
+                        let available_quantity = quantity_results[0].quantity_oz;
+                        if (available_quantity < total_oz_required) {
+                            enoughQuantity = false;
+                            console.log(`Not enough quantity for RawMaterial ${recipe.raw_material_id}. Required: ${total_oz_required}, Available: ${available_quantity}`);
+                        } else {
+                            rawMaterialsToUpdate.push({
+                                raw_material_id: recipe.raw_material_id,
+                                total_oz_used: total_oz_required
+                            });
+                        }
+                        callback(null, true);
+                    });
+                }
+
+                let checkQuantityPromises = recipe_results.map(recipe => {
+                    return new Promise((resolve, reject) => {
+                        checkQuantity(recipe, (error, result) => {
+                            if (error) {
+                                reject(error);
+                            } else {
+                                resolve(result);
+                            }
+                        });
+                    });
+                });
+
+                Promise.all(checkQuantityPromises)
+                    .then(() => {
+                        if (!enoughQuantity) {
+                            return res.status(400).send('Not enough raw material quantity to fulfill the order');
+                        }
+
+                        // If there is enough quantity, proceed with inserting the new sale and updating the RawMaterials table
+                        let query_insert_sale = `
+                            INSERT INTO SalesOrders 
+                            (product_id, customer_id, bottle_quantity, date_shipped, total_sale, total_cost)
+                            VALUES (?, ?, ?, ?, ?, ?)
+                        `;
+
+                        let params = [product_id, customer_id, bottle_quantity, date_shipped, total_sale, total_cost];
+
+                        db.pool.query(query_insert_sale, params, function(error, rows, fields) {
+                            if (error) {
+                                console.log('Database error:', error);
+                                return res.sendStatus(400);
+                            }
+
+                            // Update the quantity of each raw material used in the order
+                            rawMaterialsToUpdate.forEach(function(rawMaterial) {
+                                let query_update_material_qty = `
+                                    UPDATE RawMaterials
+                                    SET quantity_oz = quantity_oz - ?
+                                    WHERE raw_material_id = ?
+                                `;
+
+                                db.pool.query(query_update_material_qty, [rawMaterial.total_oz_used, rawMaterial.raw_material_id], function(error, update_results, fields) {
+                                    if (error) {
+                                        console.log(error);
+                                        return res.sendStatus(400);
+                                    }
+
+                                    console.log(`Updated RawMaterial ${rawMaterial.raw_material_id} by deducting ${rawMaterial.total_oz_used} oz`);
+                                });
+                            });
+
+                            return res.redirect('/SalesOrders');
+                        });
+                    })
+                    .catch(error => {
                         console.log(error);
                         return res.sendStatus(400);
-                    }
-                        // Deduct the required quantity from each raw material
-                        recipe_results.forEach(function(recipe) {
-                            let total_oz_used = recipe.required_oz * bottle_quantity;
-    
-                            let query_update_material_qty = `
-                                UPDATE RawMaterials
-                                SET quantity_oz = quantity_oz - ?
-                                WHERE raw_material_id = ?
-                            `;
-    
-                            db.pool.query(query_update_material_qty, [total_oz_used, recipe.raw_material_id], function(error, update_results, fields) {
-                                if (error) {
-                                    console.log(error);
-                                    return res.sendStatus(400);
-                                }
-    
-                                console.log(`Updated RawMaterial ${recipe.raw_material_id} by deducting ${total_oz_used} oz`);
-                            });
-                        });
-                
-                return res.redirect('/SalesOrders');
-                });
+                    });
             });
         });
     });
 });
-
-
-
-
 
 /* UPDATE Sales Orders */
 app.put('/update-sale-ajax', function(req, res) {
