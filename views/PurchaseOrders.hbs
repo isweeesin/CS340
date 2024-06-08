@@ -39,7 +39,7 @@
 
 </table>
 
-<h2>Search for a Purchase</h2>
+<h2>Search a purchase order...</h2>
 <p>Search by ingredient using the field below.</p>
 
 <form id="search-raw_material-html" method='GET' action='/PurchaseOrders'>
@@ -50,16 +50,17 @@
 </form>
 
 {{!-- Form to add a record to PurchaseOrder table using standard HTML forms --}}
-<h2>Add a Purchase Order</h2>
+<h2>Add a purchase order...</h2>
+<p>Input the requisiton and the date it was received.</p>
 <form id="add-purchase-form" method="POST" action="/add-purchase-form">
+
     <label for="selectMaterial">Ingredient: </label>
     <select name="selectMaterial" id="selectMaterial">
         <option value="">Select an existing ingredient:</option>
         {{#each ingredients}}
-        <option value="{{this.material_name}}">{{this.raw_material_id}}: {{this.material_name}}</option>
+        <option value="{{this.material_name}}">{{this.material_name}}</option>
         {{/each}}
     </select>
-    
     
     <label for="input-order-oz">Order Oz: </label>
     <input type="number" name="input-order-oz" id="input-order-oz">
@@ -71,8 +72,8 @@
 </form>
 
 {{!-- form to update PurchaseOrder table using ajax --}}
-<h2>Edit Purchase Order</h2>
-<p>Update</p>
+<h2>Edit purchase order...</h2>
+<p><strong>NOTE: This is only for administrative purposes, this will NOT increase or decrease raw material inventory levels.</strong></p>
 <form id="update-po-form-ajax">
     <label for="mySelect">Select Purchase Order: </label>
     <select name="update_po_id" id="mySelect">
@@ -91,4 +92,5 @@
     <input type="submit" value="Update">
 </form>
 
+<script src="/js/delete_purchase_order.js"></script>
 <script src="/js/update_purchase_order.js"></script>
