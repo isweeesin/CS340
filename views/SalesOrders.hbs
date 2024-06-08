@@ -53,11 +53,12 @@
 
 <h2>Add a new transaction...</h2>
 <p><strong>NOTE: Sale will not process unless there is enough raw material on hand to manufacture the product.</strong></p>
+<p>If you do not see a flavor in the selection it means it does not have a recipe. You can create a recipe for the flavor on the Recipe page.</p>
 <form id="add-sale-form" method="POST" action="/add-sale-form">
     <label for="selectFlavor">Select Flavor: </label>
     <select name="selectFlavor" id="selectFlavor">
         <option value="">Select a Flavor</option>
-        {{#each flavors}}
+        {{#each selection}}
         <option value="{{this.flavor}}">{{this.flavor}}</option>
         {{/each}}
     </select>
