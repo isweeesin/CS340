@@ -14,9 +14,11 @@
         {{!-- For just the first row, we print each key of the row object as a header cell so we
         know what each column means when the page renders --}}
         <tr>
+            <tr>
             <th>Product ID</th>
             <th>Flavor</th>
-            <th>Price Per Bottle</th>
+            <th>Price per Bottle</th>
+        </tr>
         </tr>
     </thead>
 
@@ -38,8 +40,8 @@
 <script src="./js/delete_product.js"></script>
 
 
-<h2>Search Flavors</h2>
-<p>Search flavors using the field below.</p>
+<h2>Search flavors...</h2>
+<p>Search flavor by name using the field below.</p>
 
 <form id="search-flavor-html" method='GET' action='/Products'>
     <label for="search-flavor">Search: </label>
@@ -49,12 +51,13 @@
 </form>
 
 {{!-- Form to add a record to product table using standard HTML forms --}}
-<h2>Add a new sauce:</h2>
-<p style="color:red"> *NOTE* You must create a recipe for your new product on the Recipe page in order for it to be valid for sale! </p>
+<h2>Add a new flavor...</h2>
+<p style="color:red"> NOTE: You must create a recipe for your new product on the Recipe page in order for it to be valid for sale. </p>
 <form id="add-product-form" method="POST" action="/add-product-form">
+
     <label for="input-flavor">Flavor: </label>
     <input type="text" name="input-flavor" id="input-flavor" required>
-    
+
     <label for="input-price">Price per Bottle: </label>
     <input type="number" name="input-price" id="input-price" min="0" step=".01" required>
 
@@ -63,7 +66,7 @@
 
 
 {{!-- form to update product table using ajax --}}
-<h2>Make Changes:</h2>
+<h2>Update flavor...</h2>
 <p>Update a specific flavor's price or name using the form below.</p>
 <form id="update-product-form-ajax">
     <label for="mySelect">Select existing flavor: </label>
@@ -75,9 +78,9 @@
     </select>
     {{!-- ID's must be different than INSERT --}}
     <label for="input-new-flavor">New name: </label>
-    <input type="text" name="input-new-flavor" id="input-new-flavor">
+    <input type="text" name="input-new-flavor" id="input-new-flavor" required>
     <label for="update-product-price">Price: </label>
-    <input type="number" name="update-product-price" id="update-product-price" min="0" step=".01">
+    <input type="number" name="update-product-price" id="update-product-price" min="0" step=".01" required>
     <input type="submit" value="Update">
 
 </form>
