@@ -1,4 +1,3 @@
-
 {{!-- Citation for the following file: index.hbs -> handlebar for Customer page
 Date: 5/22/2024
 Copied from:
@@ -21,8 +20,7 @@ Source URL: https://canvas.oregonstate.edu/courses/1958399/pages/exploration-dev
     {{!-- Header section --}}
     <thead>
 
-        {{!-- For just the first row, we print each key of the row object as a header cell so we
-        know what each column means when the page renders --}}
+        {{!-- Custom names--}}
         <tr>
             <th>Customer ID</th>
             <th>Customer Name</th>
@@ -50,7 +48,7 @@ Source URL: https://canvas.oregonstate.edu/courses/1958399/pages/exploration-dev
 <script src="./js/delete_customer.js"></script>
 
 
-<h2>Search Customers</h2>
+<h2>Search customers...</h2>
 <p>Search by name using the field below.</p>
 
 <form id="search-customer-html" method='GET' action='/Customers'>
@@ -62,7 +60,7 @@ Source URL: https://canvas.oregonstate.edu/courses/1958399/pages/exploration-dev
 
 
 {{!-- Form to add a record to Customer table using standard HTML forms --}}
-<h2>Add a New Customer</h2>
+<h2>Add a new customer...</h2>
 <p>To add a new customer, please enter their information below and click `Submit`!</p>
 <form id="add-customer-form" method="POST" action="/add-customer-form">
     <label for="input-name">Name: </label>
@@ -77,8 +75,7 @@ Source URL: https://canvas.oregonstate.edu/courses/1958399/pages/exploration-dev
     <input type="submit">
 </form>
 {{!-- form to update customer table using ajax --}}
-<h2>Updating Customer Information</h2>
-<p>*Blank values will be left unchanged eventually...</p>
+<h2>Updating customer unformation...</h2>
 <form id="update-customer-form-ajax">
     <label for="mySelect">Select Customer: </label>
     <select name="input-name" id="mySelect">
