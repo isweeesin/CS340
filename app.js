@@ -714,7 +714,6 @@ app.put('/update-po-ajax', function(req, res) {
     });
 });
 
-
 /*
     READ Sales Orders   
 */
@@ -728,8 +727,8 @@ app.get('/SalesOrders', function(req, res) {
         querySalesOrders = `
         SELECT SalesOrders.sale_id, Products.flavor, Customers.name, SalesOrders.bottle_quantity, SalesOrders.date_shipped, SalesOrders.total_sale, SalesOrders.total_cost
         FROM SalesOrders
-        JOIN Products ON SalesOrders.product_id = Products.product_id
-        JOIN Customers ON SalesOrders.customer_id = Customers.customer_id
+        LEFT JOIN Products ON SalesOrders.product_id = Products.product_id
+        LEFT JOIN Customers ON SalesOrders.customer_id = Customers.customer_id
     `;
     }
     // If there is a query string, we assume this is a search, and return desired results
@@ -737,11 +736,20 @@ app.get('/SalesOrders', function(req, res) {
         querySalesOrders = `
         SELECT SalesOrders.sale_id, Products.flavor, Customers.name, SalesOrders.bottle_quantity, SalesOrders.date_shipped, SalesOrders.total_sale, SalesOrders.total_cost
         FROM SalesOrders
-        JOIN Products ON SalesOrders.product_id = Products.product_id
-        JOIN Customers ON SalesOrders.customer_id = Customers.customer_id
+        LEFT JOIN Products ON SalesOrders.product_id = Products.product_id
+        LEFT JOIN Customers ON SalesOrders.customer_id = Customers.customer_id
         WHERE flavor LIKE "${req.query.flavor}%"
     `;
     }
+
+    let queryFilterFlavors = `
+    SELECT Products.product_id, Products.flavor
+    FROM Products
+    WHERE Products.product_id IN (
+        SELECT product_id
+        FROM Recipes
+    )
+    `;
     
     db.pool.query(queryProducts, function(error, products, fields) {
         if (error) {
@@ -761,7 +769,18 @@ app.get('/SalesOrders', function(req, res) {
                     return res.sendStatus(500);
                 }
 
-                res.render('SalesOrders', { flavors: products, customers: customers, data: salesOrders });
+                db.pool.query(queryFilterFlavors, function(error, selection, fields) {
+                    if (error) {
+                        console.log(error);
+                        return res.sendStatus(500);
+                    }
+
+                    console.log('Products:', products);  // Log products to ensure they are not empty
+                    console.log('Customers:', customers);  // Log customers to ensure they are not empty
+                    console.log('SalesOrders:', salesOrders);
+
+                    res.render('SalesOrders', { flavors: products, customers: customers, data: salesOrders, selection: selection });
+                });
             });
         });
     });
